@@ -1,0 +1,68 @@
+{
+  "webhook_endpoints": {
+    "telegram": {
+      "url": "/webhook/telegram",
+      "method": "POST",
+      "secret_token": "your_telegram_webhook_secret",
+      "allowed_updates": [
+        "message",
+        "edited_message",
+        "callback_query"
+      ]
+    },
+    "slack": {
+      "url": "/webhook/slack",
+      "method": "POST",
+      "signing_secret": "your_slack_signing_secret",
+      "event_types": [
+        "message.channels",
+        "app_mention"
+      ]
+    },
+    "stripe": {
+      "url": "/webhook/stripe",
+      "method": "POST",
+      "webhook_secret": "whsec_your_stripe_webhook_secret",
+      "events": [
+        "payment_intent.succeeded",
+        "invoice.payment_succeeded"
+      ]
+    },
+    "asana": {
+      "url": "/webhook/asana",
+      "method": "POST",
+      "secret": "your_asana_webhook_secret",
+      "events": [
+        "task_added",
+        "task_updated",
+        "project_updated"
+      ]
+    },
+    "trello": {
+      "url": "/webhook/trello",
+      "method": "POST",
+      "secret": "your_trello_webhook_secret",
+      "events": [
+        "createCard",
+        "updateCard",
+        "addMemberToCard"
+      ]
+    }
+  },
+  "webhook_security": {
+    "verify_signatures": true,
+    "rate_limiting": {
+      "enabled": true,
+      "max_requests_per_minute": 100
+    },
+    "ip_whitelist": {
+      "enabled": false,
+      "allowed_ips": []
+    }
+  },
+  "webhook_logging": {
+    "log_all_requests": true,
+    "log_payloads": false,
+    "log_responses": true
+  }
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Frontend-Backend Connection</title>
+</head>
+<body>
+    <h1>Frontend-Backend Connection Test</h1>
+    <button onclick="testConnection()">Test Backend Connection</button>
+    <div id="result"></div>
+
+    <script>
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: "Send email to test@example.com at 8AM daily",
+                        user_id: "test@user.com"
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+                console.log('data.done:', data?.done, typeof data?.done);
+                console.log('data.json exists:', data?.json ? 'yes' : 'no');
+                console.log('Condition result:', data?.done && data?.json);
+
+                resultDiv.innerHTML = `
+                    <h3>✅ Success!</h3>
+                    <p><strong>Done:</strong> ${data?.done}</p>
+                    <p><strong>JSON exists:</strong> ${data?.json ? 'Yes' : 'No'}</p>
+                    <p><strong>Nodes count:</strong> ${data?.json?.nodes?.length || 0}</p>
+                    <p><strong>Condition passes:</strong> ${data?.done && data?.json ? 'Yes' : 'No'}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ Error</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

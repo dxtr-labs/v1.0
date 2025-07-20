@@ -1,0 +1,62 @@
+{
+  "metrics": {
+    "enabled": true,
+    "endpoint": "/metrics",
+    "port": 8001,
+    "collect_interval": 60
+  },
+  "health_checks": {
+    "enabled": true,
+    "endpoint": "/health",
+    "checks": [
+      {
+        "name": "database",
+        "type": "database_connection",
+        "timeout": 5
+      },
+      {
+        "name": "openai_api",
+        "type": "api_endpoint",
+        "url": "https://api.openai.com/v1/models",
+        "timeout": 10
+      },
+      {
+        "name": "disk_space",
+        "type": "disk_usage",
+        "path": "/",
+        "threshold": 90
+      }
+    ]
+  },
+  "alerts": {
+    "enabled": true,
+    "channels": [
+      "email",
+      "slack",
+      "telegram"
+    ],
+    "rules": [
+      {
+        "name": "high_error_rate",
+        "metric": "error_rate",
+        "threshold": 0.05,
+        "duration": "5m",
+        "severity": "critical"
+      },
+      {
+        "name": "slow_response_time",
+        "metric": "response_time_p95",
+        "threshold": 5000,
+        "duration": "10m",
+        "severity": "warning"
+      }
+    ]
+  },
+  "dashboards": {
+    "grafana": {
+      "enabled": true,
+      "url": "http://localhost:3000",
+      "datasource": "prometheus"
+    }
+  }
+}

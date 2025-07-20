@@ -1,0 +1,34 @@
+{
+  "total_categories": 4,
+  "passed_categories": 0,
+  "failed_categories": 4,
+  "success_rate": 0.0,
+  "total_scenarios": 40,
+  "execution_time": 166.6370346546173,
+  "results": [
+    {
+      "test": "Email Automation Scenarios",
+      "success": false,
+      "details": "0/10 scenarios passed (0.0%)",
+      "timestamp": 1752796141.5643156
+    },
+    {
+      "test": "Content Creation Scenarios",
+      "success": false,
+      "details": "0/10 scenarios passed (0.0%)",
+      "timestamp": 1752796183.2755597
+    },
+    {
+      "test": "Data Processing Scenarios",
+      "success": false,
+      "details": "0/10 scenarios passed (0.0%)",
+      "timestamp": 1752796224.8893738
+    },
+    {
+      "test": "Complex Automation Scenarios",
+      "success": false,
+      "details": "0/10 scenarios passed (0.0%)",
+      "timestamp": 1752796266.563708
+    }
+  ]
+}

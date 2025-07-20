@@ -1,0 +1,155 @@
+"""
+Universal Driver for Utility Driver
+Auto-generated driver for handling 2 node types
+"""
+
+import logging
+import asyncio
+from typing import Dict, Any, List
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from universal_driver_manager import BaseUniversalDriver
+
+class UtilityDriverDriver(BaseUniversalDriver):
+    """Universal driver for utility_driver service"""
+    
+    def __init__(self):
+        super().__init__()
+        self.service_name = "utility_driver"
+        self.supported_node_types = ['n8n-nodes-base.stickyNote', 'n8n-nodes-base.noOp']
+    
+    def get_supported_node_types(self) -> List[str]:
+        """Get list of supported node types"""
+        return self.supported_node_types
+    
+    def get_required_parameters(self, node_type: str) -> List[str]:
+        """Get required parameters for node type"""
+        # Default required parameters - override in specific implementations
+        common_params = {"url", "endpoint", "method", "data", "headers", "auth"}
+        
+        if node_type in self.supported_node_types:
+            return list(common_params.intersection(self._get_common_params(node_type)))
+        return []
+    
+    def _get_common_params(self, node_type: str) -> set:
+        """Get common parameters for node type"""
+        if "http" in node_type.lower() or "request" in node_type.lower():
+            return {"url", "method", "headers"}
+        elif "email" in node_type.lower() or "mail" in node_type.lower():
+            return {"to", "subject", "body", "from"}
+        elif "trigger" in node_type.lower():
+            return {"event", "condition"}
+        elif "webhook" in node_type.lower():
+            return {"url", "method", "data"}
+        else:
+            return {"data", "config"}
+    
+    async def execute(self, node_type: str, parameters: Dict[str, Any], context: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Execute node based on type"""
+        if node_type not in self.supported_node_types:
+            return {
+                "success": False,
+                "error": f"Unsupported node type: {node_type}",
+                "supported_types": self.supported_node_types
+            }
+        
+        # Validate parameters
+        if not self.validate_parameters(node_type, parameters):
+            return {
+                "success": False,
+                "error": f"Missing required parameters for {node_type}",
+                "required": self.get_required_parameters(node_type)
+            }
+        
+        # Route to specific method
+        method_name = self._node_type_to_method_name(node_type)
+        
+        if hasattr(self, method_name):
+            return await getattr(self, method_name)(parameters, context)
+        else:
+            return await self._execute_generic(node_type, parameters, context)
+    
+    def _node_type_to_method_name(self, node_type: str) -> str:
+        """Convert node type to method name"""
+        # Remove prefixes and convert to valid method name
+        clean_name = node_type.replace('n8n-nodes-base.', '').replace('@n8n/n8n-nodes-langchain.', '').replace('-', '_').replace('.', '_')
+        return f"execute_{clean_name}"
+    
+    async def _execute_generic(self, node_type: str, parameters: Dict[str, Any], context: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Generic execution for any node type"""
+        self.logger.info(f"Executing generic {node_type} with parameters: {list(parameters.keys())}")
+        
+        try:
+            # Generic successful execution
+            result = {
+                "success": True,
+                "node_type": node_type,
+                "service": self.service_name,
+                "message": f"Executed {node_type} successfully (generic handler)",
+                "data": parameters,
+                "output": f"Generic output for {node_type}"
+            }
+            
+            self.logger.info(f"✅ {node_type} completed (generic)")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"❌ {node_type} failed: {e}")
+            return {
+                "success": False,
+                "node_type": node_type,
+                "error": str(e),
+                "message": f"{node_type} execution failed (generic)"
+            }
+
+    async def execute_stickyNote(self, parameters: Dict[str, Any], context: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Execute n8n-nodes-base.stickyNote node"""
+        self.logger.info(f"Executing n8n-nodes-base.stickyNote with parameters: {list(parameters.keys())}")
+        
+        try:
+            # TODO: Implement actual n8n-nodes-base.stickyNote logic
+            result = {
+                "success": True,
+                "node_type": "n8n-nodes-base.stickyNote",
+                "message": f"Executed n8n-nodes-base.stickyNote successfully",
+                "data": parameters,
+                "output": f"Mock output for n8n-nodes-base.stickyNote"
+            }
+            
+            self.logger.info(f"✅ n8n-nodes-base.stickyNote completed successfully")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"❌ n8n-nodes-base.stickyNote failed: {e}")
+            return {
+                "success": False,
+                "node_type": "n8n-nodes-base.stickyNote",
+                "error": str(e),
+                "message": f"n8n-nodes-base.stickyNote execution failed"
+            }
+    async def execute_noOp(self, parameters: Dict[str, Any], context: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Execute n8n-nodes-base.noOp node"""
+        self.logger.info(f"Executing n8n-nodes-base.noOp with parameters: {list(parameters.keys())}")
+        
+        try:
+            # TODO: Implement actual n8n-nodes-base.noOp logic
+            result = {
+                "success": True,
+                "node_type": "n8n-nodes-base.noOp",
+                "message": f"Executed n8n-nodes-base.noOp successfully",
+                "data": parameters,
+                "output": f"Mock output for n8n-nodes-base.noOp"
+            }
+            
+            self.logger.info(f"✅ n8n-nodes-base.noOp completed successfully")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"❌ n8n-nodes-base.noOp failed: {e}")
+            return {
+                "success": False,
+                "node_type": "n8n-nodes-base.noOp",
+                "error": str(e),
+                "message": f"n8n-nodes-base.noOp execution failed"
+            }

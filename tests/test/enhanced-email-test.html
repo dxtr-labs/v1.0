@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced MCP AI Email Automation Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">🚀 Enhanced MCP AI Email Automation</h1>
+        
+        <!-- Test Different Scenarios -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- AI Content Generation Test -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-blue-600">✨ AI Content Generation</h2>
+                <div class="space-y-3">
+                    <button onclick="testAIContent('good_morning')" 
+                            class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Test: Good Morning Email
+                    </button>
+                    <button onclick="testAIContent('professional')" 
+                            class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Test: Professional Email
+                    </button>
+                    <button onclick="testAIContent('notification')" 
+                            class="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                        Test: Notification Email
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Scheduling Test -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-green-600">⏰ Email Scheduling</h2>
+                <div class="space-y-3">
+                    <button onclick="testScheduling('daily')" 
+                            class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Test: Daily 8 AM
+                    </button>
+                    <button onclick="testScheduling('weekly')" 
+                            class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Test: Weekly Monday
+                    </button>
+                    <button onclick="testScheduling('custom')" 
+                            class="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                        Test: Custom Time
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Custom Request Test -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">🛠️ Custom Request Test</h2>
+            <div class="flex space-x-4">
+                <input type="email" id="customEmail" placeholder="Recipient email" 
+                       class="flex-1 px-3 py-2 border rounded-md" value="slakshanand1105@gmail.com">
+                <input type="text" id="customMessage" placeholder="Your email automation request" 
+                       class="flex-2 px-3 py-2 border rounded-md" 
+                       value="generate beautiful good morning email">
+                <button onclick="testCustomRequest()" 
+                        class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700">
+                    Send
+                </button>
+            </div>
+        </div>
+        
+        <!-- Results Display -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">📊 Results</h2>
+            <div id="results" class="space-y-4">
+                <p class="text-gray-600">Results will appear here...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        async function testAIContent(type) {
+            const messages = {
+                'good_morning': 'generate good morning email and send to slakshanand1105@gmail.com',
+                'professional': 'create professional greeting email for slakshanand1105@gmail.com',
+                'notification': 'send notification email to slakshanand1105@gmail.com about system update'
+            };
+            
+            await sendRequest(messages[type], `AI ${type.replace('_', ' ')} Email`);
+        }
+        
+        async function testScheduling(frequency) {
+            const messages = {
+                'daily': 'schedule daily good morning email at 8 AM to slakshanand1105@gmail.com',
+                'weekly': 'schedule weekly report email every Monday at 9 AM to slakshanand1105@gmail.com',
+                'custom': 'schedule reminder email at 3 PM daily to slakshanand1105@gmail.com'
+            };
+            
+            await sendRequest(messages[frequency], `${frequency} Scheduling`);
+        }
+        
+        async function testCustomRequest() {
+            const email = document.getElementById('customEmail').value;
+            const message = document.getElementById('customMessage').value;
+            
+            if (!email || !message) {
+                showResult('Custom Request', { error: 'Please fill in both email and message' });
+                return;
+            }
+            
+            const fullMessage = `${message} and send to ${email}`;
+            await sendRequest(fullMessage, 'Custom Request');
+        }
+        
+        async function sendRequest(message, testType) {
+            try {
+                showResult(testType, { loading: true });
+                
+                const response = await fetch(`${API_BASE}/api/chat/mcpai`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        agentId: 'alex',
+                        agentConfig: {
+                            name: 'TestAgent',
+                            role: 'EmailAutomation'
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                showResult(testType, data);
+                
+            } catch (error) {
+                showResult(testType, { error: error.message });
+            }
+        }
+        
+        function showResult(testType, data) {
+            const resultsDiv = document.getElementById('results');
+            const resultElement = document.createElement('div');
+            resultElement.className = 'border-l-4 border-blue-500 pl-4 py-2';
+            
+            if (data.loading) {
+                resultElement.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+                        <strong>${testType}:</strong> <span class="text-blue-600">Processing...</span>
+                    </div>
+                `;
+            } else if (data.error) {
+                resultElement.className = 'border-l-4 border-red-500 pl-4 py-2';
+                resultElement.innerHTML = `
+                    <strong>${testType}:</strong> 
+                    <span class="text-red-600">❌ ${data.error}</span>
+                `;
+            } else {
+                const success = data.response && !data.response.includes('❌');
+                resultElement.className = `border-l-4 ${success ? 'border-green-500' : 'border-red-500'} pl-4 py-2`;
+                
+                resultElement.innerHTML = `
+                    <div>
+                        <strong>${testType}:</strong> 
+                        <span class="${success ? 'text-green-600' : 'text-red-600'}">
+                            ${success ? '✅' : '❌'} ${data.response}
+                        </span>
+                        ${data.workflow_generated ? '<span class="text-blue-500 text-sm"> [Workflow Generated]</span>' : ''}
+                        ${data.ai_enhanced ? '<span class="text-purple-500 text-sm"> [AI Enhanced]</span>' : ''}
+                        ${data.needs_confirmation ? '<span class="text-gray-500 text-sm"> [Needs Confirmation]</span>' : ''}
+                    </div>
+                    ${data.execution_details ? `
+                        <div class="text-xs text-gray-600 mt-1">
+                            Execution: ${JSON.stringify(data.execution_details, null, 2)}
+                        </div>
+                    ` : ''}
+                `;
+            }
+            
+            // Clear existing results and add new one
+            if (resultsDiv.children.length > 1 || !resultsDiv.children[0]?.textContent.includes('Results will appear')) {
+                // Find existing result for this test type and replace it
+                const existing = Array.from(resultsDiv.children).find(child => 
+                    child.textContent.includes(testType + ':')
+                );
+                if (existing) {
+                    existing.remove();
+                }
+            } else {
+                resultsDiv.innerHTML = '';
+            }
+            
+            resultsDiv.appendChild(resultElement);
+        }
+    </script>
+</body>
+</html>

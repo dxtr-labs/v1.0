@@ -1,0 +1,170 @@
+{
+  "total": 27,
+  "passed": 3,
+  "failed": 24,
+  "success_rate": 11.11111111111111,
+  "details": [
+    {
+      "test": "Simple Workflow POST",
+      "success": false,
+      "details": "HTTP 404: {\"detail\":\"Not Found\"}",
+      "timestamp": 1752806862.026078
+    },
+    {
+      "test": "Complex Large Workflow",
+      "success": false,
+      "details": "HTTP 404",
+      "timestamp": 1752806864.0646534
+    },
+    {
+      "test": "Retrieve Workflow GET",
+      "success": false,
+      "details": "No workflow ID provided",
+      "timestamp": 1752806864.0646534
+    },
+    {
+      "test": "Invalid Workflow Data",
+      "success": false,
+      "details": "Only 0/5 properly rejected",
+      "timestamp": 1752806874.2108004
+    },
+    {
+      "test": "Malformed JSON",
+      "success": true,
+      "details": "Properly rejected with 404",
+      "timestamp": 1752806876.23714
+    },
+    {
+      "test": "Nonexistent Workflow GET",
+      "success": true,
+      "details": "Properly returned 404",
+      "timestamp": 1752806878.2853854
+    },
+    {
+      "test": "Missing Workflow ID GET",
+      "success": true,
+      "details": "Properly failed: None",
+      "timestamp": 1752806880.3156667
+    },
+    {
+      "test": "Special Characters Workflow",
+      "success": false,
+      "details": "HTTP 404",
+      "timestamp": 1752806882.3508928
+    },
+    {
+      "test": "Concurrent Requests",
+      "success": false,
+      "details": "Only 0/5 requests succeeded",
+      "timestamp": 1752806884.391361
+    },
+    {
+      "test": "Workflow Expiration Logic",
+      "success": false,
+      "details": "Could not store workflow: 404",
+      "timestamp": 1752806886.426906
+    },
+    {
+      "test": "URL Encoding Simulation",
+      "success": false,
+      "details": "HTTP 404",
+      "timestamp": 1752806888.4730155
+    },
+    {
+      "test": "Edge Case Node Types",
+      "success": false,
+      "details": "HTTP 404",
+      "timestamp": 1752806890.4988825
+    },
+    {
+      "test": "Multiple Email User Inputs",
+      "success": false,
+      "details": "Only 0/5 email scenarios succeeded",
+      "timestamp": 1752806900.6576133
+    },
+    {
+      "test": "Multiple Content Creation User Inputs",
+      "success": false,
+      "details": "Only 0/5 content scenarios succeeded",
+      "timestamp": 1752806910.8347805
+    },
+    {
+      "test": "Multiple Data Processing User Inputs",
+      "success": false,
+      "details": "Only 0/5 data scenarios succeeded",
+      "timestamp": 1752806921.010795
+    },
+    {
+      "test": "Multiple Mixed Scenario User Inputs",
+      "success": false,
+      "details": "Only 0/5 complex scenarios succeeded",
+      "timestamp": 1752806931.1526244
+    },
+    {
+      "test": "Search Engine Automation User Inputs",
+      "success": false,
+      "details": "Only 0/5 search scenarios succeeded",
+      "timestamp": 1752806941.3323276
+    },
+    {
+      "test": "DXTR Agent Station Integration",
+      "success": false,
+      "details": "Only 0/5 agent scenarios succeeded",
+      "timestamp": 1752806951.5086515
+    },
+    {
+      "test": "OpenAI Workflow Search Accuracy",
+      "success": false,
+      "details": "Below target accuracy: 0.0%",
+      "timestamp": 1752806961.7225645
+    },
+    {
+      "test": "Template Library Coverage",
+      "success": false,
+      "details": "Only 0 templates found, 0 categories working",
+      "timestamp": 1752806998.3467577
+    },
+    {
+      "test": "Personalized AI Memory System",
+      "success": false,
+      "details": "Only 0/5 memory scenarios succeeded",
+      "timestamp": 1752807008.5259886
+    },
+    {
+      "test": "Enterprise Integration APIs",
+      "success": false,
+      "details": "Only 0 integration categories working",
+      "timestamp": 1752807024.7582412
+    },
+    {
+      "test": "DXTR Agent Station Integration",
+      "success": false,
+      "details": "Only 0/5 agent scenarios succeeded",
+      "timestamp": 1752807034.909768
+    },
+    {
+      "test": "OpenAI Workflow Search Accuracy",
+      "success": false,
+      "details": "Below target accuracy: 0.0%",
+      "timestamp": 1752807045.0878184
+    },
+    {
+      "test": "Template Library Coverage",
+      "success": false,
+      "details": "Only 0 templates found, 0 categories working",
+      "timestamp": 1752807081.6486824
+    },
+    {
+      "test": "Personalized AI Memory System",
+      "success": false,
+      "details": "Only 0/5 memory scenarios succeeded",
+      "timestamp": 1752807091.84828
+    },
+    {
+      "test": "Enterprise Integration APIs",
+      "success": false,
+      "details": "Only 0 integration categories working",
+      "timestamp": 1752807108.1824334
+    }
+  ]
+}

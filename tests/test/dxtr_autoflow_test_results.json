@@ -1,0 +1,119 @@
+{
+  "timestamp": "2025-07-17 19:57:43",
+  "total_tests": 22,
+  "passed": 18,
+  "failed": 4,
+  "success_rate": 81.81818181818183,
+  "results": [
+    {
+      "test": "Health Check",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "User Registration",
+      "success": true,
+      "status": "Success"
+    },
+    {
+      "test": "Agent List",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "Template Library",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "Workflow Generation",
+      "success": false,
+      "status": 500
+    },
+    {
+      "test": "MCP AI Chat",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "Email Service",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "Automation Execution",
+      "success": false,
+      "status": 400
+    },
+    {
+      "test": "AI Scenario 1",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "AI Scenario 2",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "AI Scenario 3",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "AI Scenario 4",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "AI Scenario 5",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "AI Scenario 6",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "AI Scenario 7",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "AI Scenario 8",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "AI Scenario 9",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "AI Scenario 10",
+      "success": true,
+      "status": 200
+    },
+    {
+      "test": "Template Library",
+      "success": true,
+      "status": "0 templates"
+    },
+    {
+      "test": "Concurrent Requests",
+      "success": true,
+      "status": "10/10 succeeded"
+    },
+    {
+      "test": "Agent Creation",
+      "success": false,
+      "status": 400
+    },
+    {
+      "test": "Agent Creation",
+      "success": false,
+      "status": 400
+    }
+  ]
+}

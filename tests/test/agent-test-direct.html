@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Test - Direct Backend Connection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-6">🤖 Agent Test - Direct Backend Connection</h1>
+        
+        <!-- Connection Test -->
+        <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+            <h2 class="font-bold mb-2">Backend Connection Test</h2>
+            <button onclick="testConnection()" class="bg-blue-500 text-white px-4 py-2 rounded">Test Backend</button>
+            <div id="connectionResult" class="mt-2 text-sm"></div>
+        </div>
+
+        <!-- Agent Creation -->
+        <div class="mb-6 p-4 bg-green-50 rounded-lg">
+            <h2 class="font-bold mb-2">Create Test Agent</h2>
+            <input type="text" id="agentName" placeholder="Agent Name (e.g., TestBot)" class="border p-2 mr-2 rounded">
+            <select id="agentRole" class="border p-2 mr-2 rounded">
+                <option value="HR Manager">HR Manager</option>
+                <option value="Customer Support">Customer Support</option>
+                <option value="Sales Representative">Sales Representative</option>
+            </select>
+            <button onclick="createAgent()" class="bg-green-500 text-white px-4 py-2 rounded">Create Agent</button>
+            <div id="createResult" class="mt-2 text-sm"></div>
+        </div>
+
+        <!-- Chat Test -->
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <h2 class="font-bold mb-2">Chat with Agent</h2>
+            <input type="text" id="agentId" placeholder="Agent ID" class="border p-2 mr-2 rounded">
+            <input type="text" id="chatMessage" placeholder="Type your message" class="border p-2 mr-2 rounded flex-1">
+            <button onclick="sendChat()" class="bg-gray-500 text-white px-4 py-2 rounded">Send</button>
+            <div id="chatResult" class="mt-2 text-sm bg-white p-2 rounded border"></div>
+        </div>
+
+        <!-- Email Test -->
+        <div class="mb-6 p-4 bg-purple-50 rounded-lg">
+            <h2 class="font-bold mb-2">Email Automation Test</h2>
+            <input type="text" id="emailAgentId" placeholder="Agent ID" class="border p-2 mr-2 rounded">
+            <button onclick="sendEmailTest()" class="bg-purple-500 text-white px-4 py-2 rounded">Send Test Email</button>
+            <div id="emailResult" class="mt-2 text-sm"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentAgentId = null;
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('connectionResult');
+            try {
+                const response = await fetch(`${API_BASE}/debug/test`);
+                const data = await response.json();
+                resultDiv.innerHTML = `✅ <span class="text-green-600">Connected! ${data.message}</span>`;
+            } catch (error) {
+                resultDiv.innerHTML = `❌ <span class="text-red-600">Connection failed: ${error.message}</span>`;
+            }
+        }
+
+        async function createAgent() {
+            const resultDiv = document.getElementById('createResult');
+            const name = document.getElementById('agentName').value || 'TestBot';
+            const role = document.getElementById('agentRole').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/agents`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        role: role,
+                        description: `Test agent created at ${new Date().toLocaleTimeString()}`
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentAgentId = data.agent.AgentID;
+                    document.getElementById('agentId').value = currentAgentId;
+                    document.getElementById('emailAgentId').value = currentAgentId;
+                    resultDiv.innerHTML = `✅ <span class="text-green-600">Agent created! ID: ${currentAgentId}</span>`;
+                } else {
+                    resultDiv.innerHTML = `❌ <span class="text-red-600">Failed: ${data.error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ <span class="text-red-600">Error: ${error.message}</span>`;
+            }
+        }
+
+        async function sendChat() {
+            const resultDiv = document.getElementById('chatResult');
+            const agentId = document.getElementById('agentId').value;
+            const message = document.getElementById('chatMessage').value;
+            
+            if (!agentId || !message) {
+                resultDiv.innerHTML = '<span class="text-red-600">Please provide both Agent ID and message</span>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/chat/mcpai`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        agentId: agentId,
+                        agentConfig: {
+                            name: 'TestAgent',
+                            role: 'Assistant'
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <div class="mb-2"><strong>You:</strong> ${message}</div>
+                    <div class="mb-2"><strong>Agent:</strong> ${data.response}</div>
+                    <div class="text-xs text-gray-500">Session: ${data.session_id}</div>
+                `;
+                
+                document.getElementById('chatMessage').value = '';
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="text-red-600">Error: ${error.message}</span>`;
+            }
+        }
+
+        async function sendEmailTest() {
+            const resultDiv = document.getElementById('emailResult');
+            const agentId = document.getElementById('emailAgentId').value;
+            
+            if (!agentId) {
+                resultDiv.innerHTML = '<span class="text-red-600">Please provide Agent ID</span>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/chat/mcpai`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'Send email to slakshanand1105@gmail.com with subject "Test from Agent" and message "Hello! This is a test email from your agent."',
+                        agentId: agentId,
+                        agentConfig: {
+                            name: 'TestAgent',
+                            role: 'Assistant'
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.innerHTML = `<span class="text-green-600">Response: ${data.response}</span>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="text-red-600">Error: ${error.message}</span>`;
+            }
+        }
+
+        function build_mcp_prompt(user_prompt, user_input) {
+            const base = user_prompt || "You are a world-class automation planner. Understand the user's intent and output a valid workflow JSON.";
+            return `${base}\n\nUser: ${user_input}\n\nWorkflow:`;
+        }
+
+        // Auto-test connection on load
+        window.onload = () => {
+            testConnection();
+        };
+    </script>
+</body>
+</html>

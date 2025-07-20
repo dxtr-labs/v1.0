@@ -1,0 +1,254 @@
+{
+  "results": [
+    {
+      "input": "Send an email to john@example.com with subject 'Meeting Tomorrow'",
+      "workflowType": "email",
+      "selectedScript": "email-default",
+      "confidence": 0.1,
+      "matchedKeywords": 0
+    },
+    {
+      "input": "Forward this email to the marketing team",
+      "workflowType": "email",
+      "selectedScript": "email-forward",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Schedule a bulk email campaign for next week",
+      "workflowType": "email",
+      "selectedScript": "bulk-email",
+      "confidence": 0.6,
+      "matchedKeywords": 2
+    },
+    {
+      "input": "Send a Gmail to my boss about the project update",
+      "workflowType": "email",
+      "selectedScript": "gmail-send",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Compose an Outlook message for the client",
+      "workflowType": "email",
+      "selectedScript": "outlook-send",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Create a new task in Asana for the design review",
+      "workflowType": "task",
+      "selectedScript": "asana-task",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Add a Trello card to the development board",
+      "workflowType": "task",
+      "selectedScript": "trello-card",
+      "confidence": 0.6,
+      "matchedKeywords": 2
+    },
+    {
+      "input": "Open a Jira ticket for the bug report",
+      "workflowType": "task",
+      "selectedScript": "jira-ticket",
+      "confidence": 0.6,
+      "matchedKeywords": 2
+    },
+    {
+      "input": "Make a new GitHub issue for feature request",
+      "workflowType": "webhook",
+      "selectedScript": "webhook-default",
+      "confidence": 0.1,
+      "matchedKeywords": 0
+    },
+    {
+      "input": "Set up a Monday.com task for the deadline",
+      "workflowType": "task",
+      "selectedScript": "monday-task",
+      "confidence": 0.6,
+      "matchedKeywords": 2
+    },
+    {
+      "input": "Post this to Twitter with #productivity hashtag",
+      "workflowType": "social",
+      "selectedScript": "twitter-post",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Share on LinkedIn about our company update",
+      "workflowType": "social",
+      "selectedScript": "linkedin-post",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Upload to Instagram with vacation photos",
+      "workflowType": "social",
+      "selectedScript": "instagram-post",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Post on Facebook about the event",
+      "workflowType": "social",
+      "selectedScript": "facebook-post",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Tweet about the new product launch",
+      "workflowType": "webhook",
+      "selectedScript": "webhook-default",
+      "confidence": 0.1,
+      "matchedKeywords": 0
+    },
+    {
+      "input": "Schedule a Zoom meeting for tomorrow at 2 PM",
+      "workflowType": "meeting",
+      "selectedScript": "zoom-meeting",
+      "confidence": 0.6,
+      "matchedKeywords": 2
+    },
+    {
+      "input": "Book a Teams call with the development team",
+      "workflowType": "meeting",
+      "selectedScript": "teams-meeting",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Set up a Google Meet for the client presentation",
+      "workflowType": "webhook",
+      "selectedScript": "webhook-default",
+      "confidence": 0.1,
+      "matchedKeywords": 0
+    },
+    {
+      "input": "Create a calendar event for the board meeting",
+      "workflowType": "meeting",
+      "selectedScript": "google-meet",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Schedule a video conference for training",
+      "workflowType": "meeting",
+      "selectedScript": "meeting-default",
+      "confidence": 0.1,
+      "matchedKeywords": 0
+    },
+    {
+      "input": "Export this data to Excel spreadsheet",
+      "workflowType": "data",
+      "selectedScript": "excel-export",
+      "confidence": 0.6,
+      "matchedKeywords": 2
+    },
+    {
+      "input": "Create a CSV report of sales data",
+      "workflowType": "data",
+      "selectedScript": "csv-export",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Generate a PDF document with the analysis",
+      "workflowType": "data",
+      "selectedScript": "pdf-generate",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Import data from the Google Sheets",
+      "workflowType": "data",
+      "selectedScript": "sheets-import",
+      "confidence": 0.6,
+      "matchedKeywords": 2
+    },
+    {
+      "input": "Update the database with new records",
+      "workflowType": "data",
+      "selectedScript": "database-update",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Send a webhook notification to Slack",
+      "workflowType": "webhook",
+      "selectedScript": "slack-webhook",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Trigger an API call to the payment system",
+      "workflowType": "webhook",
+      "selectedScript": "api-call",
+      "confidence": 0.6,
+      "matchedKeywords": 2
+    },
+    {
+      "input": "Post data to the external webhook",
+      "workflowType": "social",
+      "selectedScript": "social-default",
+      "confidence": 0.1,
+      "matchedKeywords": 0
+    },
+    {
+      "input": "Send notification to Discord channel",
+      "workflowType": "webhook",
+      "selectedScript": "discord-webhook",
+      "confidence": 0.3,
+      "matchedKeywords": 1
+    },
+    {
+      "input": "Call the REST API endpoint",
+      "workflowType": "webhook",
+      "selectedScript": "api-call",
+      "confidence": 0.6,
+      "matchedKeywords": 2
+    }
+  ],
+  "summary": {
+    "scriptCounts": {
+      "email-default": 1,
+      "email-forward": 1,
+      "bulk-email": 1,
+      "gmail-send": 1,
+      "outlook-send": 1,
+      "asana-task": 1,
+      "trello-card": 1,
+      "jira-ticket": 1,
+      "webhook-default": 3,
+      "monday-task": 1,
+      "twitter-post": 1,
+      "linkedin-post": 1,
+      "instagram-post": 1,
+      "facebook-post": 1,
+      "zoom-meeting": 1,
+      "teams-meeting": 1,
+      "google-meet": 1,
+      "meeting-default": 1,
+      "excel-export": 1,
+      "csv-export": 1,
+      "pdf-generate": 1,
+      "sheets-import": 1,
+      "database-update": 1,
+      "slack-webhook": 1,
+      "api-call": 2,
+      "social-default": 1,
+      "discord-webhook": 1
+    },
+    "workflowCounts": {
+      "email": 5,
+      "task": 4,
+      "webhook": 7,
+      "social": 5,
+      "meeting": 4,
+      "data": 5
+    },
+    "averageConfidence": 0.3499999999999999
+  }
+}

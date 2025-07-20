@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Root and body styles for theme colors - IMPORTANT OVERRIDES */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #F8FAFC !important;
+  transition: background-color 0.3s ease !important;
+}
+
+html.dark, body.dark {
+  background-color: #0F172A !important;
+}
+
+/* Ensure Next.js root elements inherit background */
+#__next, [data-nextjs-scroll-focus-boundary] {
+  min-height: 100vh !important;
+  background-color: inherit !important;
+}
+
+/* Remove any default browser styling */
+html::before, html::after, body::before, body::after {
+  display: none !important;
+}
+
+:root {
+  /* Modern Dark Theme Colors */
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  
+  /* Primary Colors */
+  --primary: #3B82F6;           /* Blue-500 */
+  --primary-dark: #1D4ED8;      /* Blue-700 */
+  --secondary: #8B5CF6;         /* Purple-500 */
+  --accent: #10B981;            /* Emerald-500 */
+  
+  /* System colors */
+  --muted: rgba(0, 0, 0, 0.6);
+  --muted-foreground: rgba(0, 0, 0, 0.6);
+  --accent-foreground: #000000;
+}
+
+.dark {
+  --background: #0F172A;
+  --foreground: #F8FAFC;
+  --muted: rgba(255, 255, 255, 0.6);
+  --muted-foreground: rgba(255, 255, 255, 0.6);
+  --accent-foreground: #F8FAFC;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  background-color: #F8FAFC !important;
+  color: hsl(var(--foreground));
+  transition: background-color 0.3s ease !important;
+}
+
+body.dark {
+  background-color: #0F172A !important;
+}
+
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer utilities {
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
+  .text-foreground {
+    color: hsl(var(--foreground));
+  }
+}
+
+body {
+  background-color: #F8FAFC !important;
+  color: hsl(var(--foreground));
+  transition: background-color 0.3s ease !important;
+}
+
+body.dark {
+  background-color: #0F172A !important;
+}
+
+@layer components {
+  .aurora-blur {
+    @apply fixed inset-0 z-0;
+    background-image: 
+      radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 1) 0px, transparent 70%),
+      radial-gradient(at 97% 21%, hsla(256, 98%, 72%, 1) 0px, transparent 70%),
+      radial-gradient(at 52% 99%, hsla(354, 98%, 61%, 1) 0px, transparent 70%),
+      radial-gradient(at 10% 29%, hsla(256, 96%, 67%, 1) 0px, transparent 70%),
+      radial-gradient(at 97% 96%, hsla(38, 60%, 74%, 1) 0px, transparent 70%),
+      radial-gradient(at 33% 50%, hsla(222, 67%, 73%, 1) 0px, transparent 70%),
+      radial-gradient(at 79% 53%, hsla(343, 68%, 79%, 1) 0px, transparent 70%);
+    filter: blur(80px);
+    opacity: 0.8;
+    animation: aurora 60s linear infinite;
+  }
+}
+
+@keyframes aurora {
+  0% {
+    background-position: 50% 50%, 50% 50%;
+  }
+  100% {
+    background-position: 350% 50%, 350% 50%;
+  }
+}
+
+
+
+@theme {
+  --color-background: #F8FAFC;
+  --color-foreground: #1E293B;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #1E293B;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1E293B;
+
+  --color-primary: #FF6B6B;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #64748B;
+  --color-secondary-foreground: #F8FAFC;
+
+  --color-muted: #E2E8F0;
+  --color-muted-foreground: #64748B;
+
+  --color-accent: #FFE5E5;
+  --color-accent-foreground: #1E293B;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+
+  --color-border: #E5E7EB;
+  --color-input: #E5E7EB;
+  --color-ring: #64748B;
+
+  --color-chart-1: #e67e22;
+  --color-chart-2: #2d8659;
+  --color-chart-3: #1e3a5f;
+  --color-chart-4: #f1c40f;
+  --color-chart-5: #e74c3c;
+
+  --color-sidebar: #F1F5F9;
+  --color-sidebar-foreground: #475569;
+  --color-sidebar-primary: #FF6B6B;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #FFFFFF;
+  --color-sidebar-accent-foreground: #1E293B;
+  --color-sidebar-border: #CBD5E1;
+  --color-sidebar-ring: #FF6B6B;
+
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  --font-sans: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: #E5E7EB;
+  }
+}
+
+@layer utilities {
+  body {
+    font-family: var(--font-body);
+  }
+}
+
+@layer base {
+  :root {
+    --background: var(--color-background);
+    --foreground: var(--color-foreground);
+    --card: var(--color-card);
+    --card-foreground: var(--color-card-foreground);
+    --popover: var(--color-popover);
+    --popover-foreground: var(--color-popover-foreground);
+    --primary: var(--color-primary);
+    --primary-foreground: var(--color-primary-foreground);
+    --secondary: var(--color-secondary);
+    --secondary-foreground: var(--color-secondary-foreground);
+    --muted: var(--color-muted);
+    --muted-foreground: var(--color-muted-foreground);
+    --accent: var(--color-accent);
+    --accent-foreground: var(--color-accent-foreground);
+    --destructive: var(--color-destructive);
+    --destructive-foreground: var(--color-destructive-foreground);
+    --border: var(--color-border);
+    --input: var(--color-input);
+    --ring: var(--color-ring);
+    --chart-1: var(--color-chart-1);
+    --chart-2: var(--color-chart-2);
+    --chart-3: var(--color-chart-3);
+    --chart-4: var(--color-chart-4);
+    --chart-5: var(--color-chart-5);
+    --radius: var(--radius-lg);
+    --sidebar-background: var(--color-sidebar);
+    --sidebar-foreground: var(--color-sidebar-foreground);
+    --sidebar-primary: var(--color-sidebar-primary);
+    --sidebar-primary-foreground: var(--color-sidebar-primary-foreground);
+    --sidebar-accent: var(--color-sidebar-accent);
+    --sidebar-accent-foreground: var(--color-sidebar-accent-foreground);
+    --sidebar-border: var(--color-sidebar-border);
+    --sidebar-ring: var(--color-sidebar-ring);
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    color: var(--foreground);
+  }
+
+  a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
+

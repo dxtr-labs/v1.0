@@ -1,0 +1,550 @@
+{
+  "original_prompt": {
+    "user_input": "Fetch data from server and send email to slakshanand1105@gmail.com",
+    "intent_data": {
+      "intent": "data_email_workflow",
+      "confidence": 0.6,
+      "extracted_emails": [
+        "slakshanand1105@gmail.com"
+      ],
+      "data_keywords_found": [
+        "fetch",
+        "data"
+      ],
+      "server_keywords_found": [
+        "server"
+      ],
+      "email_keywords_found": [
+        "email",
+        "send",
+        "mail"
+      ],
+      "keyword_counts": {
+        "data_processing": 3,
+        "email_automation": 4,
+        "data_email_workflow": 6
+      }
+    },
+    "workflow": {
+      "id": "local_workflow_001",
+      "name": "User Request: Fetch data from server and send email to slakshana...",
+      "description": "Automated workflow for: Fetch data from server and send email to slakshanand1105@gmail.com",
+      "user_input": "Fetch data from server and send email to slakshanand1105@gmail.com",
+      "detected_intent": "data_email_workflow",
+      "confidence": 0.6,
+      "nodes": [
+        {
+          "id": "trigger_1",
+          "type": "manual_trigger",
+          "name": "Manual Trigger",
+          "description": "User initiated the workflow",
+          "parameters": {
+            "user_request": "Fetch data from server and send email to slakshanand1105@gmail.com"
+          }
+        },
+        {
+          "id": "data_fetch",
+          "type": "data_source",
+          "name": "Fetch Data from Server",
+          "description": "Retrieve data based on user request",
+          "parameters": {
+            "source_keywords": [
+              "server"
+            ],
+            "data_type": [
+              "fetch",
+              "data"
+            ],
+            "fetch_method": "auto_detect"
+          }
+        },
+        {
+          "id": "data_process",
+          "type": "data_processor",
+          "name": "Process Retrieved Data",
+          "description": "Format and prepare data for email",
+          "parameters": {
+            "format": "email_friendly",
+            "include_summary": true
+          }
+        },
+        {
+          "id": "email_compose",
+          "type": "email_composer",
+          "name": "Compose Email",
+          "description": "Create email with fetched data",
+          "parameters": {
+            "recipients": [
+              "slakshanand1105@gmail.com"
+            ],
+            "subject": "Data Report from Server",
+            "include_data": true,
+            "format": "html_table"
+          }
+        },
+        {
+          "id": "email_send",
+          "type": "email_sender",
+          "name": "Send Email",
+          "description": "Send email to specified recipients",
+          "parameters": {
+            "recipients": [
+              "slakshanand1105@gmail.com"
+            ],
+            "delivery_method": "smtp",
+            "priority": "normal"
+          }
+        }
+      ]
+    },
+    "validation": {
+      "Email Address Detected": true,
+      "Target Email (slakshanand1105@gmail.com) Found": true,
+      "Data Fetching Nodes Present": true,
+      "Email Sending Nodes Present": true,
+      "Workflow Has Trigger": true,
+      "Correct Intent Detected": true
+    },
+    "success": true
+  },
+  "variations": [
+    {
+      "user_input": "Get customer data from database and email report to slakshanand1105@gmail.com",
+      "intent_data": {
+        "intent": "data_email_workflow",
+        "confidence": 0.7,
+        "extracted_emails": [
+          "slakshanand1105@gmail.com"
+        ],
+        "data_keywords_found": [
+          "get",
+          "data",
+          "report"
+        ],
+        "server_keywords_found": [
+          "database"
+        ],
+        "email_keywords_found": [
+          "email",
+          "mail",
+          "report"
+        ],
+        "keyword_counts": {
+          "data_processing": 4,
+          "email_automation": 4,
+          "data_email_workflow": 7
+        }
+      },
+      "workflow": {
+        "id": "local_workflow_001",
+        "name": "User Request: Get customer data from database and email report t...",
+        "description": "Automated workflow for: Get customer data from database and email report to slakshanand1105@gmail.com",
+        "user_input": "Get customer data from database and email report to slakshanand1105@gmail.com",
+        "detected_intent": "data_email_workflow",
+        "confidence": 0.7,
+        "nodes": [
+          {
+            "id": "trigger_1",
+            "type": "manual_trigger",
+            "name": "Manual Trigger",
+            "description": "User initiated the workflow",
+            "parameters": {
+              "user_request": "Get customer data from database and email report to slakshanand1105@gmail.com"
+            }
+          },
+          {
+            "id": "data_fetch",
+            "type": "data_source",
+            "name": "Fetch Data from Server",
+            "description": "Retrieve data based on user request",
+            "parameters": {
+              "source_keywords": [
+                "database"
+              ],
+              "data_type": [
+                "get",
+                "data",
+                "report"
+              ],
+              "fetch_method": "auto_detect"
+            }
+          },
+          {
+            "id": "data_process",
+            "type": "data_processor",
+            "name": "Process Retrieved Data",
+            "description": "Format and prepare data for email",
+            "parameters": {
+              "format": "email_friendly",
+              "include_summary": true
+            }
+          },
+          {
+            "id": "email_compose",
+            "type": "email_composer",
+            "name": "Compose Email",
+            "description": "Create email with fetched data",
+            "parameters": {
+              "recipients": [
+                "slakshanand1105@gmail.com"
+              ],
+              "subject": "Data Report from Server",
+              "include_data": true,
+              "format": "html_table"
+            }
+          },
+          {
+            "id": "email_send",
+            "type": "email_sender",
+            "name": "Send Email",
+            "description": "Send email to specified recipients",
+            "parameters": {
+              "recipients": [
+                "slakshanand1105@gmail.com"
+              ],
+              "delivery_method": "smtp",
+              "priority": "normal"
+            }
+          }
+        ]
+      },
+      "validation": {
+        "Email Address Detected": true,
+        "Target Email (slakshanand1105@gmail.com) Found": true,
+        "Data Fetching Nodes Present": true,
+        "Email Sending Nodes Present": true,
+        "Workflow Has Trigger": true,
+        "Correct Intent Detected": true
+      },
+      "success": true
+    },
+    {
+      "user_input": "Retrieve sales data from server and send to slakshanand1105@gmail.com",
+      "intent_data": {
+        "intent": "data_email_workflow",
+        "confidence": 0.5,
+        "extracted_emails": [
+          "slakshanand1105@gmail.com"
+        ],
+        "data_keywords_found": [
+          "retrieve",
+          "data"
+        ],
+        "server_keywords_found": [
+          "server"
+        ],
+        "email_keywords_found": [
+          "send",
+          "mail"
+        ],
+        "keyword_counts": {
+          "data_processing": 3,
+          "email_automation": 3,
+          "data_email_workflow": 5
+        }
+      },
+      "workflow": {
+        "id": "local_workflow_001",
+        "name": "User Request: Retrieve sales data from server and send to slaksh...",
+        "description": "Automated workflow for: Retrieve sales data from server and send to slakshanand1105@gmail.com",
+        "user_input": "Retrieve sales data from server and send to slakshanand1105@gmail.com",
+        "detected_intent": "data_email_workflow",
+        "confidence": 0.5,
+        "nodes": [
+          {
+            "id": "trigger_1",
+            "type": "manual_trigger",
+            "name": "Manual Trigger",
+            "description": "User initiated the workflow",
+            "parameters": {
+              "user_request": "Retrieve sales data from server and send to slakshanand1105@gmail.com"
+            }
+          },
+          {
+            "id": "data_fetch",
+            "type": "data_source",
+            "name": "Fetch Data from Server",
+            "description": "Retrieve data based on user request",
+            "parameters": {
+              "source_keywords": [
+                "server"
+              ],
+              "data_type": [
+                "retrieve",
+                "data"
+              ],
+              "fetch_method": "auto_detect"
+            }
+          },
+          {
+            "id": "data_process",
+            "type": "data_processor",
+            "name": "Process Retrieved Data",
+            "description": "Format and prepare data for email",
+            "parameters": {
+              "format": "email_friendly",
+              "include_summary": true
+            }
+          },
+          {
+            "id": "email_compose",
+            "type": "email_composer",
+            "name": "Compose Email",
+            "description": "Create email with fetched data",
+            "parameters": {
+              "recipients": [
+                "slakshanand1105@gmail.com"
+              ],
+              "subject": "Data Report from Server",
+              "include_data": true,
+              "format": "html_table"
+            }
+          },
+          {
+            "id": "email_send",
+            "type": "email_sender",
+            "name": "Send Email",
+            "description": "Send email to specified recipients",
+            "parameters": {
+              "recipients": [
+                "slakshanand1105@gmail.com"
+              ],
+              "delivery_method": "smtp",
+              "priority": "normal"
+            }
+          }
+        ]
+      },
+      "validation": {
+        "Email Address Detected": true,
+        "Target Email (slakshanand1105@gmail.com) Found": true,
+        "Data Fetching Nodes Present": true,
+        "Email Sending Nodes Present": true,
+        "Workflow Has Trigger": true,
+        "Correct Intent Detected": true
+      },
+      "success": true
+    },
+    {
+      "user_input": "Pull analytics from API and email summary to slakshanand1105@gmail.com",
+      "intent_data": {
+        "intent": "data_email_workflow",
+        "confidence": 0.5,
+        "extracted_emails": [
+          "slakshanand1105@gmail.com"
+        ],
+        "data_keywords_found": [
+          "pull",
+          "analytics"
+        ],
+        "server_keywords_found": [
+          "api",
+          "analytics"
+        ],
+        "email_keywords_found": [
+          "email",
+          "mail"
+        ],
+        "keyword_counts": {
+          "data_processing": 4,
+          "email_automation": 3,
+          "data_email_workflow": 5
+        }
+      },
+      "workflow": {
+        "id": "local_workflow_001",
+        "name": "User Request: Pull analytics from API and email summary to slaks...",
+        "description": "Automated workflow for: Pull analytics from API and email summary to slakshanand1105@gmail.com",
+        "user_input": "Pull analytics from API and email summary to slakshanand1105@gmail.com",
+        "detected_intent": "data_email_workflow",
+        "confidence": 0.5,
+        "nodes": [
+          {
+            "id": "trigger_1",
+            "type": "manual_trigger",
+            "name": "Manual Trigger",
+            "description": "User initiated the workflow",
+            "parameters": {
+              "user_request": "Pull analytics from API and email summary to slakshanand1105@gmail.com"
+            }
+          },
+          {
+            "id": "data_fetch",
+            "type": "data_source",
+            "name": "Fetch Data from Server",
+            "description": "Retrieve data based on user request",
+            "parameters": {
+              "source_keywords": [
+                "api",
+                "analytics"
+              ],
+              "data_type": [
+                "pull",
+                "analytics"
+              ],
+              "fetch_method": "auto_detect"
+            }
+          },
+          {
+            "id": "data_process",
+            "type": "data_processor",
+            "name": "Process Retrieved Data",
+            "description": "Format and prepare data for email",
+            "parameters": {
+              "format": "email_friendly",
+              "include_summary": true
+            }
+          },
+          {
+            "id": "email_compose",
+            "type": "email_composer",
+            "name": "Compose Email",
+            "description": "Create email with fetched data",
+            "parameters": {
+              "recipients": [
+                "slakshanand1105@gmail.com"
+              ],
+              "subject": "Data Report from Server",
+              "include_data": true,
+              "format": "html_table"
+            }
+          },
+          {
+            "id": "email_send",
+            "type": "email_sender",
+            "name": "Send Email",
+            "description": "Send email to specified recipients",
+            "parameters": {
+              "recipients": [
+                "slakshanand1105@gmail.com"
+              ],
+              "delivery_method": "smtp",
+              "priority": "normal"
+            }
+          }
+        ]
+      },
+      "validation": {
+        "Email Address Detected": true,
+        "Target Email (slakshanand1105@gmail.com) Found": true,
+        "Data Fetching Nodes Present": true,
+        "Email Sending Nodes Present": true,
+        "Workflow Has Trigger": true,
+        "Correct Intent Detected": true
+      },
+      "success": true
+    },
+    {
+      "user_input": "Extract user logs from system and mail results to slakshanand1105@gmail.com",
+      "intent_data": {
+        "intent": "data_email_workflow",
+        "confidence": 0.4,
+        "extracted_emails": [
+          "slakshanand1105@gmail.com"
+        ],
+        "data_keywords_found": [
+          "extract",
+          "logs"
+        ],
+        "server_keywords_found": [
+          "system"
+        ],
+        "email_keywords_found": [
+          "mail"
+        ],
+        "keyword_counts": {
+          "data_processing": 3,
+          "email_automation": 2,
+          "data_email_workflow": 4
+        }
+      },
+      "workflow": {
+        "id": "local_workflow_001",
+        "name": "User Request: Extract user logs from system and mail results to ...",
+        "description": "Automated workflow for: Extract user logs from system and mail results to slakshanand1105@gmail.com",
+        "user_input": "Extract user logs from system and mail results to slakshanand1105@gmail.com",
+        "detected_intent": "data_email_workflow",
+        "confidence": 0.4,
+        "nodes": [
+          {
+            "id": "trigger_1",
+            "type": "manual_trigger",
+            "name": "Manual Trigger",
+            "description": "User initiated the workflow",
+            "parameters": {
+              "user_request": "Extract user logs from system and mail results to slakshanand1105@gmail.com"
+            }
+          },
+          {
+            "id": "data_fetch",
+            "type": "data_source",
+            "name": "Fetch Data from Server",
+            "description": "Retrieve data based on user request",
+            "parameters": {
+              "source_keywords": [
+                "system"
+              ],
+              "data_type": [
+                "extract",
+                "logs"
+              ],
+              "fetch_method": "auto_detect"
+            }
+          },
+          {
+            "id": "data_process",
+            "type": "data_processor",
+            "name": "Process Retrieved Data",
+            "description": "Format and prepare data for email",
+            "parameters": {
+              "format": "email_friendly",
+              "include_summary": true
+            }
+          },
+          {
+            "id": "email_compose",
+            "type": "email_composer",
+            "name": "Compose Email",
+            "description": "Create email with fetched data",
+            "parameters": {
+              "recipients": [
+                "slakshanand1105@gmail.com"
+              ],
+              "subject": "Data Report from Server",
+              "include_data": true,
+              "format": "html_table"
+            }
+          },
+          {
+            "id": "email_send",
+            "type": "email_sender",
+            "name": "Send Email",
+            "description": "Send email to specified recipients",
+            "parameters": {
+              "recipients": [
+                "slakshanand1105@gmail.com"
+              ],
+              "delivery_method": "smtp",
+              "priority": "normal"
+            }
+          }
+        ]
+      },
+      "validation": {
+        "Email Address Detected": true,
+        "Target Email (slakshanand1105@gmail.com) Found": true,
+        "Data Fetching Nodes Present": true,
+        "Email Sending Nodes Present": true,
+        "Workflow Has Trigger": true,
+        "Correct Intent Detected": true
+      },
+      "success": true
+    }
+  ],
+  "summary": {
+    "original_success": true,
+    "successful_variations": 4,
+    "total_variations": 4,
+    "overall_success_rate": 0.2
+  }
+}

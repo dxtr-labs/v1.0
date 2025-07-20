@@ -1,0 +1,46 @@
+{
+  "total_categories": 5,
+  "passed_categories": 2,
+  "failed_categories": 3,
+  "success_rate": 40.0,
+  "execution_time": 0.01089620590209961,
+  "processing_capabilities": {
+    "email_detection": true,
+    "content_analysis": true,
+    "data_workflow_generation": true,
+    "automation_scenario_handling": true,
+    "parameter_extraction": true
+  },
+  "results": [
+    {
+      "test": "Email Input Processing",
+      "success": true,
+      "details": "10/10 emails processed correctly (100.0%)",
+      "timestamp": 1752797825.5242434
+    },
+    {
+      "test": "Content Input Processing",
+      "success": false,
+      "details": "5/10 content requests processed correctly (50.0%)",
+      "timestamp": 1752797825.5258443
+    },
+    {
+      "test": "Data Input Processing",
+      "success": false,
+      "details": "5/10 data requests processed correctly (50.0%)",
+      "timestamp": 1752797825.5288563
+    },
+    {
+      "test": "Complex Automation Processing",
+      "success": false,
+      "details": "1/10 automation requests processed correctly (10.0%)",
+      "timestamp": 1752797825.530448
+    },
+    {
+      "test": "Parameter Extraction Accuracy",
+      "success": true,
+      "details": "5/5 extraction tests passed (100.0%)",
+      "timestamp": 1752797825.5320241
+    }
+  ]
+}

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Frontend Services Test - Web Search + Multiple Email Automation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        
+        .test-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .test-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        
+        .results {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            display: inline-block;
+            margin: 5px;
+        }
+        
+        .status.success { background: #4CAF50; }
+        .status.error { background: #f44336; }
+        .status.warning { background: #ff9800; }
+        .status.info { background: #2196F3; }
+        
+        .email-preview {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Frontend Services Testing Suite</h1>
+            <h2>Web Search + Multiple Email Automation</h2>
+            <p>Testing all services availability through the frontend interface</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="test-section">
+            <h3>🔐 Authentication Test</h3>
+            <p>First, let's authenticate with the backend:</p>
+            <button class="test-button" onclick="testAuthentication()">Test Authentication</button>
+            <div id="auth-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Context Extraction Test -->
+        <div class="test-section">
+            <h3>🧠 Context Extraction Test</h3>
+            <p>Test the two-part system's context extraction capabilities:</p>
+            <input type="text" id="context-message" class="test-input" 
+                   placeholder="e.g., My company is TechCorp and we sell AI automation services"
+                   value="Hi, my company is TechCorp Inc and we develop AI automation solutions including FastMCP">
+            <button class="test-button" onclick="testContextExtraction()">Test Context Storage</button>
+            <div id="context-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Single Email Automation Test -->
+        <div class="test-section">
+            <h3>📧 Single Email Automation Test</h3>
+            <p>Test basic email automation with context:</p>
+            <input type="text" id="single-email-message" class="test-input" 
+                   placeholder="e.g., Send an email to test@example.com about our services"
+                   value="Send an email to slakshanand1105@gmail.com about our TechCorp AI automation services">
+            <button class="test-button" onclick="testSingleEmail()">Test Single Email</button>
+            <div id="single-email-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Multiple Email Automation Test -->
+        <div class="test-section">
+            <h3>📧📧 Multiple Email Automation Test</h3>
+            <p>Test multiple recipient email automation:</p>
+            <input type="text" id="multi-email-message" class="test-input" 
+                   placeholder="e.g., Send emails to multiple recipients about our services"
+                   value="Send emails to slakshanand1105@gmail.com, test@example.com, and demo@techcorp.com about our AI automation platform">
+            <button class="test-button" onclick="testMultipleEmails()">Test Multiple Emails</button>
+            <div id="multi-email-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Web Search + Email Test -->
+        <div class="test-section">
+            <h3>🔍📧 Web Search + Email Integration Test</h3>
+            <p>Test the complete web search + email automation workflow:</p>
+            <input type="text" id="search-email-message" class="test-input" 
+                   placeholder="e.g., Research AI competitors and email findings to team"
+                   value="Research top 5 AI automation companies and send detailed analysis to slakshanand1105@gmail.com">
+            <button class="test-button" onclick="testWebSearchEmail()">Test Search + Email</button>
+            <div id="search-email-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Bulk Business Scenario Test -->
+        <div class="test-section">
+            <h3>🏢 Business Scenario Test</h3>
+            <p>Test real-world business automation scenarios:</p>
+            <select id="business-scenario" class="test-input">
+                <option value="investor">Investor Outreach Campaign</option>
+                <option value="client">Client Update Newsletter</option>
+                <option value="competitor">Competitor Analysis Distribution</option>
+                <option value="partnership">Partnership Proposal Blast</option>
+                <option value="product">Product Launch Announcement</option>
+            </select>
+            <button class="test-button" onclick="testBusinessScenario()">Test Business Automation</button>
+            <div id="business-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Email Confirmation Flow Test -->
+        <div class="test-section">
+            <h3>✅ Email Confirmation Flow Test</h3>
+            <p>Test the email preview and confirmation system:</p>
+            <button class="test-button" onclick="testEmailConfirmation()">Test Confirmation Flow</button>
+            <button class="test-button" onclick="confirmEmailSend()" id="confirm-button" style="display: none;">Confirm Send</button>
+            <div id="confirmation-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- System Status Dashboard -->
+        <div class="test-section">
+            <h3>📊 System Status Dashboard</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="overall-progress"></div>
+            </div>
+            <div id="status-dashboard">
+                <div id="auth-status" class="status info">🔐 Authentication: Ready</div>
+                <div id="context-status" class="status info">🧠 Context System: Ready</div>
+                <div id="email-status" class="status info">📧 Email Service: Ready</div>
+                <div id="search-status" class="status info">🔍 Web Search: Ready</div>
+                <div id="multi-status" class="status info">📧📧 Multiple Emails: Ready</div>
+                <div id="business-status" class="status info">🏢 Business Logic: Ready</div>
+            </div>
+        </div>
+
+        <!-- Run All Tests -->
+        <div class="test-section" style="text-align: center;">
+            <h3>🚀 Comprehensive Testing</h3>
+            <button class="test-button" onclick="runAllTests()" style="font-size: 18px; padding: 15px 30px;">
+                Run All Frontend Tests
+            </button>
+            <div id="comprehensive-results" class="results" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8002';
+        let sessionToken = null;
+        let testResults = {
+            auth: false,
+            context: false,
+            singleEmail: false,
+            multiEmail: false,
+            searchEmail: false,
+            business: false,
+            confirmation: false
+        };
+
+        // Update status indicators
+        function updateStatus(testName, success) {
+            testResults[testName] = success;
+            const statusElement = document.getElementById(testName + '-status');
+            if (statusElement) {
+                statusElement.className = 'status ' + (success ? 'success' : 'error');
+                statusElement.textContent = statusElement.textContent.replace('Ready', success ? 'PASS' : 'FAIL');
+            }
+            updateOverallProgress();
+        }
+
+        function updateOverallProgress() {
+            const total = Object.keys(testResults).length;
+            const passed = Object.values(testResults).filter(Boolean).length;
+            const percentage = (passed / total) * 100;
+            document.getElementById('overall-progress').style.width = percentage + '%';
+        }
+
+        // Authentication test
+        async function testAuthentication() {
+            const resultsDiv = document.getElementById('auth-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="status info">🔄 Testing authentication...</div>';
+
+            try {
+                const response = await fetch(API_BASE + '/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'aitest@example.com',
+                        password: 'testpass123'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    sessionToken = data.session_token;
+                    resultsDiv.innerHTML = '<div class="status success">✅ Authentication successful!</div>' +
+                                         '<p>Session token obtained: ' + sessionToken.substring(0, 20) + '...</p>';
+                    updateStatus('auth', true);
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">❌ Authentication failed</div>' +
+                                         '<p>Status: ' + response.status + '</p>';
+                    updateStatus('auth', false);
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="status error">❌ Authentication error</div>' +
+                                     '<p>' + error.message + '</p>';
+                updateStatus('auth', false);
+            }
+        }
+
+        // Context extraction test
+        async function testContextExtraction() {
+            if (!sessionToken) {
+                alert('Please authenticate first!');
+                return;
+            }
+
+            const message = document.getElementById('context-message').value;
+            const resultsDiv = document.getElementById('context-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="status info">🔄 Testing context extraction...</div>';
+
+            try {
+                const response = await fetch(API_BASE + '/api/chat/mcpai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cookie': 'session_token=' + sessionToken
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const isContext = !data.hasWorkflowJson && !data.workflow_json;
+                    
+                    resultsDiv.innerHTML = 
+                        '<div class="status ' + (isContext ? 'success' : 'warning') + '">' +
+                        (isContext ? '✅ Context mode detected' : '⚠️ Automation detected instead') + '</div>' +
+                        '<p><strong>Response:</strong> ' + data.message.substring(0, 200) + '...</p>';
+                    
+                    updateStatus('context', isContext);
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">❌ Context test failed</div>' +
+                                         '<p>Status: ' + response.status + '</p>';
+                    updateStatus('context', false);
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="status error">❌ Context test error</div>' +
+                                     '<p>' + error.message + '</p>';
+                updateStatus('context', false);
+            }
+        }
+
+        // Single email test
+        async function testSingleEmail() {
+            if (!sessionToken) {
+                alert('Please authenticate first!');
+                return;
+            }
+
+            const message = document.getElementById('single-email-message').value;
+            const resultsDiv = document.getElementById('single-email-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="status info">🔄 Testing single email automation...</div>';
+
+            try {
+                const response = await fetch(API_BASE + '/api/chat/mcpai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cookie': 'session_token=' + sessionToken
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const isEmail = data.hasWorkflowJson || data.workflow_json || 
+                                   data.message.toLowerCase().includes('email');
+                    
+                    resultsDiv.innerHTML = 
+                        '<div class="status ' + (isEmail ? 'success' : 'error') + '">' +
+                        (isEmail ? '✅ Email automation detected' : '❌ No email automation detected') + '</div>' +
+                        '<div class="email-preview">' + data.message.substring(0, 400) + '...</div>';
+                    
+                    updateStatus('singleEmail', isEmail);
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">❌ Single email test failed</div>';
+                    updateStatus('singleEmail', false);
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="status error">❌ Single email test error</div>' +
+                                     '<p>' + error.message + '</p>';
+                updateStatus('singleEmail', false);
+            }
+        }
+
+        // Multiple email test
+        async function testMultipleEmails() {
+            if (!sessionToken) {
+                alert('Please authenticate first!');
+                return;
+            }
+
+            const message = document.getElementById('multi-email-message').value;
+            const resultsDiv = document.getElementById('multi-email-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="status info">🔄 Testing multiple email automation...</div>';
+
+            try {
+                const response = await fetch(API_BASE + '/api/chat/mcpai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cookie': 'session_token=' + sessionToken
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const isMultiEmail = data.message.toLowerCase().includes('email') &&
+                                        (data.message.includes('@') || data.message.includes('multiple'));
+                    
+                    // Count recipients in response
+                    const emailMatches = data.message.match(/@[\w.-]+\.\w+/g) || [];
+                    
+                    resultsDiv.innerHTML = 
+                        '<div class="status ' + (isMultiEmail ? 'success' : 'error') + '">' +
+                        (isMultiEmail ? '✅ Multiple email automation detected' : '❌ Multiple email automation failed') + '</div>' +
+                        '<p><strong>Recipients found:</strong> ' + emailMatches.length + '</p>' +
+                        '<div class="email-preview">' + data.message.substring(0, 400) + '...</div>';
+                    
+                    updateStatus('multiEmail', isMultiEmail);
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">❌ Multiple email test failed</div>';
+                    updateStatus('multiEmail', false);
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="status error">❌ Multiple email test error</div>' +
+                                     '<p>' + error.message + '</p>';
+                updateStatus('multiEmail', false);
+            }
+        }
+
+        // Web search + email test
+        async function testWebSearchEmail() {
+            if (!sessionToken) {
+                alert('Please authenticate first!');
+                return;
+            }
+
+            const message = document.getElementById('search-email-message').value;
+            const resultsDiv = document.getElementById('search-email-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="status info">🔄 Testing web search + email integration...</div>';
+
+            try {
+                const response = await fetch(API_BASE + '/api/chat/mcpai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cookie': 'session_token=' + sessionToken
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const hasSearch = data.message.toLowerCase().includes('research') || 
+                                     data.message.toLowerCase().includes('analysis');
+                    const hasEmail = data.message.toLowerCase().includes('email');
+                    const isIntegrated = hasSearch && hasEmail;
+                    
+                    resultsDiv.innerHTML = 
+                        '<div class="status ' + (isIntegrated ? 'success' : 'warning') + '">' +
+                        (isIntegrated ? '✅ Web search + email integration working' : '⚠️ Partial integration detected') + '</div>' +
+                        '<p><strong>Search component:</strong> ' + (hasSearch ? '✅' : '❌') + '</p>' +
+                        '<p><strong>Email component:</strong> ' + (hasEmail ? '✅' : '❌') + '</p>' +
+                        '<div class="email-preview">' + data.message.substring(0, 400) + '...</div>';
+                    
+                    updateStatus('searchEmail', isIntegrated);
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">❌ Search + email test failed</div>';
+                    updateStatus('searchEmail', false);
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="status error">❌ Search + email test error</div>' +
+                                     '<p>' + error.message + '</p>';
+                updateStatus('searchEmail', false);
+            }
+        }
+
+        // Business scenario test
+        async function testBusinessScenario() {
+            if (!sessionToken) {
+                alert('Please authenticate first!');
+                return;
+            }
+
+            const scenario = document.getElementById('business-scenario').value;
+            const scenarios = {
+                'investor': 'Research top fintech investors and send personalized outreach emails to 3 potential investors about our AI automation startup',
+                'client': 'Send quarterly update emails to our client list about new AI features and platform improvements',
+                'competitor': 'Research latest AI trends and send competitive analysis to our team members',
+                'partnership': 'Create partnership proposal emails and send to potential collaboration partners in the AI space',
+                'product': 'Send product launch announcement emails about our new web search capabilities to our user base'
+            };
+
+            const message = scenarios[scenario];
+            const resultsDiv = document.getElementById('business-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="status info">🔄 Testing business scenario: ' + scenario + '...</div>';
+
+            try {
+                const response = await fetch(API_BASE + '/api/chat/mcpai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cookie': 'session_token=' + sessionToken
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const isBusiness = data.message.toLowerCase().includes('email') ||
+                                      data.hasWorkflowJson || data.workflow_json;
+                    
+                    resultsDiv.innerHTML = 
+                        '<div class="status ' + (isBusiness ? 'success' : 'error') + '">' +
+                        (isBusiness ? '✅ Business scenario automation working' : '❌ Business automation failed') + '</div>' +
+                        '<p><strong>Scenario:</strong> ' + scenario.charAt(0).toUpperCase() + scenario.slice(1) + '</p>' +
+                        '<div class="email-preview">' + data.message.substring(0, 400) + '...</div>';
+                    
+                    updateStatus('business', isBusiness);
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">❌ Business scenario test failed</div>';
+                    updateStatus('business', false);
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="status error">❌ Business scenario test error</div>' +
+                                     '<p>' + error.message + '</p>';
+                updateStatus('business', false);
+            }
+        }
+
+        // Email confirmation flow test
+        let confirmationResponse = null;
+        
+        async function testEmailConfirmation() {
+            if (!sessionToken) {
+                alert('Please authenticate first!');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('confirmation-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="status info">🔄 Testing email confirmation flow...</div>';
+
+            try {
+                const response = await fetch(API_BASE + '/api/chat/mcpai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cookie': 'session_token=' + sessionToken
+                    },
+                    body: JSON.stringify({ 
+                        message: 'Send a test email to slakshanand1105@gmail.com confirming all frontend services are working'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    confirmationResponse = data;
+                    
+                    const hasPreview = data.message.toLowerCase().includes('preview') ||
+                                      data.message.toLowerCase().includes('review') ||
+                                      data.message.toLowerCase().includes('confirm');
+                    
+                    resultsDiv.innerHTML = 
+                        '<div class="status ' + (hasPreview ? 'success' : 'warning') + '">' +
+                        (hasPreview ? '✅ Email preview generated' : '⚠️ No preview detected') + '</div>' +
+                        '<div class="email-preview">' + data.message.substring(0, 500) + '...</div>';
+                    
+                    if (hasPreview) {
+                        document.getElementById('confirm-button').style.display = 'inline-block';
+                    }
+                    
+                    updateStatus('confirmation', hasPreview);
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">❌ Confirmation flow test failed</div>';
+                    updateStatus('confirmation', false);
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="status error">❌ Confirmation flow test error</div>' +
+                                     '<p>' + error.message + '</p>';
+                updateStatus('confirmation', false);
+            }
+        }
+
+        async function confirmEmailSend() {
+            if (!sessionToken || !confirmationResponse) {
+                alert('Please run the confirmation test first!');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('confirmation-results');
+
+            try {
+                const response = await fetch(API_BASE + '/api/chat/mcpai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cookie': 'session_token=' + sessionToken
+                    },
+                    body: JSON.stringify({ message: 'yes' })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const isSent = data.message.toLowerCase().includes('sent') ||
+                                  data.message.toLowerCase().includes('delivered');
+                    
+                    resultsDiv.innerHTML += 
+                        '<div class="status ' + (isSent ? 'success' : 'info') + '">' +
+                        (isSent ? '✅ Email confirmation successful' : 'ℹ️ Confirmation processed') + '</div>' +
+                        '<p>' + data.message.substring(0, 200) + '...</p>';
+                    
+                    document.getElementById('confirm-button').style.display = 'none';
+                } else {
+                    resultsDiv.innerHTML += '<div class="status error">❌ Email confirmation failed</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += '<div class="status error">❌ Confirmation error: ' + error.message + '</div>';
+            }
+        }
+
+        // Run all tests sequentially
+        async function runAllTests() {
+            const resultsDiv = document.getElementById('comprehensive-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="status info">🔄 Running comprehensive frontend tests...</div>';
+
+            // Reset test results
+            Object.keys(testResults).forEach(key => testResults[key] = false);
+
+            try {
+                // Run tests in sequence
+                await testAuthentication();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testContextExtraction();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testSingleEmail();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testMultipleEmails();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testWebSearchEmail();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testBusinessScenario();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testEmailConfirmation();
+
+                // Calculate results
+                const total = Object.keys(testResults).length;
+                const passed = Object.values(testResults).filter(Boolean).length;
+                const successRate = (passed / total * 100).toFixed(1);
+
+                resultsDiv.innerHTML = 
+                    '<div class="status ' + (passed >= total * 0.8 ? 'success' : 'warning') + '">' +
+                    '🏆 Comprehensive test complete: ' + passed + '/' + total + ' passed (' + successRate + '%)' + '</div>' +
+                    '<h4>🎯 FRONTEND SERVICES STATUS:</h4>' +
+                    '<p>✅ Authentication: ' + (testResults.auth ? 'WORKING' : 'FAILED') + '</p>' +
+                    '<p>✅ Context System: ' + (testResults.context ? 'WORKING' : 'FAILED') + '</p>' +
+                    '<p>✅ Single Email: ' + (testResults.singleEmail ? 'WORKING' : 'FAILED') + '</p>' +
+                    '<p>✅ Multiple Emails: ' + (testResults.multiEmail ? 'WORKING' : 'FAILED') + '</p>' +
+                    '<p>✅ Web Search + Email: ' + (testResults.searchEmail ? 'WORKING' : 'FAILED') + '</p>' +
+                    '<p>✅ Business Automation: ' + (testResults.business ? 'WORKING' : 'FAILED') + '</p>' +
+                    '<p>✅ Email Confirmation: ' + (testResults.confirmation ? 'WORKING' : 'FAILED') + '</p>' +
+                    '<h4>🚀 SYSTEM READY FOR PRODUCTION: ' + (passed >= total * 0.8 ? 'YES' : 'NEEDS ATTENTION') + '</h4>';
+
+            } catch (error) {
+                resultsDiv.innerHTML += '<div class="status error">❌ Comprehensive test error: ' + error.message + '</div>';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateOverallProgress();
+        });
+    </script>
+</body>
+</html>

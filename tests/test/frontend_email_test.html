@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Automation Test Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+        }
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        button {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        .success {
+            background: rgba(39, 174, 96, 0.3);
+            border-left: 4px solid #27ae60;
+        }
+        .error {
+            background: rgba(231, 76, 60, 0.3);
+            border-left: 4px solid #e74c3c;
+        }
+        .loading {
+            text-align: center;
+            color: #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Email Automation Test</h1>
+        
+        <div class="form-group">
+            <label for="emailRequest">Email Request:</label>
+            <textarea 
+                id="emailRequest" 
+                rows="3" 
+                placeholder="Example: create a sales pitch email for selling premium coffee and send to slakshanand1105@gmail.com"
+            >create a sales pitch email for selling premium organic tea and send to slakshanand1105@gmail.com</textarea>
+        </div>
+        
+        <button onclick="sendEmailAutomation()" id="sendBtn">
+            Send Email Automation Request
+        </button>
+        
+        <div id="result" class="result">
+            <h3>Response:</h3>
+            <div id="responseContent"></div>
+        </div>
+    </div>
+
+    <script>
+        async function sendEmailAutomation() {
+            const button = document.getElementById('sendBtn');
+            const result = document.getElementById('result');
+            const responseContent = document.getElementById('responseContent');
+            const emailRequest = document.getElementById('emailRequest').value;
+            
+            if (!emailRequest.trim()) {
+                alert('Please enter an email request');
+                return;
+            }
+            
+            // Show loading state
+            button.disabled = true;
+            button.textContent = 'Sending...';
+            result.style.display = 'block';
+            result.className = 'result loading';
+            responseContent.innerHTML = '⏳ Processing your email automation request...';
+            
+            try {
+                // Step 1: Authenticate
+                console.log('🔐 Authenticating...');
+                const authResponse = await fetch('http://localhost:8002/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: `user_${Date.now()}`,
+                        password: 'testpassword',
+                        email: 'test@example.com'
+                    })
+                });
+                
+                let authData;
+                if (authResponse.status === 201 || authResponse.status === 200) {
+                    authData = await authResponse.json();
+                } else {
+                    // Try login instead
+                    const loginResponse = await fetch('http://localhost:8002/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: 'testuser',
+                            password: 'testpassword'
+                        })
+                    });
+                    
+                    if (loginResponse.status === 200) {
+                        authData = await loginResponse.json();
+                    } else {
+                        throw new Error('Authentication failed');
+                    }
+                }
+                
+                console.log('✅ Authenticated successfully');
+                
+                // Step 2: Send email automation request
+                console.log('📧 Sending email automation request...');
+                const emailResponse = await fetch('http://localhost:8002/api/chat/mcpai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authData.access_token}`
+                    },
+                    body: JSON.stringify({
+                        message: emailRequest,
+                        user_id: authData.user_id
+                    })
+                });
+                
+                if (emailResponse.ok) {
+                    const emailData = await emailResponse.json();
+                    console.log('✅ Email automation response:', emailData);
+                    
+                    // Show success result
+                    result.className = 'result success';
+                    responseContent.innerHTML = `
+                        <h4>✅ Email Automation Successful!</h4>
+                        <p><strong>Status:</strong> ${emailData.status || 'completed'}</p>
+                        <p><strong>Email Sent:</strong> ${emailData.email_sent ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Recipient:</strong> ${emailData.recipient_email || 'Not specified'}</p>
+                        <p><strong>Subject:</strong> ${emailData.email_subject || 'Not specified'}</p>
+                        <p><strong>Content Type:</strong> ${emailData.content_type || 'Not specified'}</p>
+                        <p><strong>Message:</strong> ${emailData.message || 'No message'}</p>
+                        ${emailData.email_content ? `
+                            <details>
+                                <summary><strong>Generated Email Content:</strong></summary>
+                                <pre style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-top: 10px; white-space: pre-wrap;">${emailData.email_content}</pre>
+                            </details>
+                        ` : ''}
+                    `;
+                } else {
+                    const errorData = await emailResponse.json();
+                    throw new Error(`API Error: ${errorData.message || 'Unknown error'}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                result.className = 'result error';
+                responseContent.innerHTML = `
+                    <h4>❌ Error</h4>
+                    <p>${error.message}</p>
+                    <p><small>Check the console for more details</small></p>
+                `;
+            } finally {
+                // Reset button state
+                button.disabled = false;
+                button.textContent = 'Send Email Automation Request';
+            }
+        }
+        
+        // Test connection on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:8002/health');
+                if (response.ok) {
+                    console.log('✅ Backend server is running');
+                } else {
+                    console.log('⚠️ Backend server responded but might have issues');
+                }
+            } catch (error) {
+                console.error('❌ Backend server not accessible:', error);
+                alert('Backend server not accessible. Please ensure it\'s running on http://localhost:8002');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+{
+  "triggers": [
+    {
+      "type": "n8n-nodes-base.cron",
+      "name": "Cron Trigger",
+      "parameters": {
+        "mode": "everyDay",
+        "hour": 9,
+        "minute": 0
+      }
+    },
+    {
+      "type": "n8n-nodes-base.webhook",
+      "name": "Webhook Trigger",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook"
+      }
+    }
+  ],
+  "email": [
+    {
+      "type": "n8n-nodes-base.emailSend",
+      "name": "Send Email",
+      "parameters": {
+        "fromEmail": "you@example.com",
+        "toEmail": "recipient@example.com",
+        "subject": "Hello",
+        "text": "Your message"
+      }
+    }
+  ],
+  "http": [
+    {
+      "type": "n8n-nodes-base.httpRequest",
+      "name": "HTTP Request",
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.example.com/data"
+      }
+    }
+  ],
+  "google": [
+    {
+      "type": "n8n-nodes-base.googleSheets",
+      "name": "Google Sheets - Append Row",
+      "parameters": {
+        "operation": "append",
+        "sheetId": "your-sheet-id",
+        "range": "Sheet1!A1:D1"
+      }
+    },
+    {
+      "type": "n8n-nodes-base.googleCalendar",
+      "name": "Google Calendar - Create Event",
+      "parameters": {
+        "calendar": "primary",
+        "start": "={{$now}}",
+        "end": "={{$addTime($now, 1, 'hour')}}",
+        "summary": "Meeting"
+      }
+    }
+  ],
+  "utilities": [
+    {
+      "type": "n8n-nodes-base.function",
+      "name": "Run JavaScript Code",
+      "parameters": {
+        "functionCode": "return items;"
+      }
+    },
+    {
+      "type": "n8n-nodes-base.delay",
+      "name": "Delay",
+      "parameters": {
+        "delay": 60000
+      }
+    }
+  ],
+  "external": [
+    {
+      "type": "n8n-nodes-base.telegram",
+      "name": "Telegram Send Message",
+      "parameters": {
+        "chatId": "12345678",
+        "text": "Hello from n8n!"
+      }
+    },
+    {
+      "type": "n8n-nodes-base.slack",
+      "name": "Slack Send Message",
+      "parameters": {
+        "channel": "#general",
+        "text": "This is an automation alert"
+      }
+    }
+  ],
+  "weather": [
+    {
+      "type": "n8n-nodes-base.httpRequest",
+      "name": "Get Weather Forecast",
+      "parameters": {
+        "url": "https://api.openweathermap.org/data/2.5/weather?q=London&appid=your_api_key",
+        "method": "GET"
+      }
+    }
+  ],
+  "location": [
+    {
+      "type": "n8n-nodes-base.httpRequest",
+      "name": "Get Vehicle ETA",
+      "parameters": {
+        "url": "https://api.example.com/vehicle/eta?vehicle_id=123",
+        "method": "GET"
+      }
+    }
+  ]
+}

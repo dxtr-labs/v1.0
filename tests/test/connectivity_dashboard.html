@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXTR AutoFlow - Connectivity Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .connection-card { transition: all 0.3s ease; }
+        .connection-card:hover { transform: translateY(-2px); }
+        .status-connected { background: linear-gradient(135deg, #10b981, #059669); }
+        .status-disconnected { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .status-testing { background: linear-gradient(135deg, #6b7280, #4b5563); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <h1 class="text-3xl font-bold text-gray-900">🔌 Connectivity Dashboard</h1>
+                    <span class="ml-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                        DXTR AutoFlow
+                    </span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="testAllConnections()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-sync-alt mr-2"></i>Test All
+                    </button>
+                    <button onclick="refreshDashboard()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-refresh mr-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100">
+                        <i class="fas fa-check-circle text-green-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Connected</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="connected-count">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-red-100">
+                        <i class="fas fa-times-circle text-red-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Disconnected</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="disconnected-count">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100">
+                        <i class="fas fa-plug text-blue-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Services</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="total-count">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100">
+                        <i class="fas fa-chart-line text-purple-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Success Rate</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="success-rate">0%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="connections-grid">
+            <!-- Connection cards will be dynamically generated here -->
+        </div>
+    </div>
+
+    <!-- Connection Setup Modal -->
+    <div id="setupModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+                <div class="px-6 py-4 border-b">
+                    <h3 class="text-lg font-medium text-gray-900" id="modal-title">Setup Connection</h3>
+                    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="px-6 py-4">
+                    <form id="connection-form">
+                        <div id="form-fields">
+                            <!-- Form fields will be dynamically generated -->
+                        </div>
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button type="button" onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                <i class="fas fa-save mr-2"></i>Save & Test
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Connection data (in real app, this would come from API)
+        let connections = {
+            "asana": {
+                "name": "Asana Project Management",
+                "icon": "📋",
+                "required_fields": ["api_token", "workspace_id"],
+                "optional_fields": ["default_project"],
+                "status": "disconnected",
+                "test_endpoint": "https://app.asana.com/api/1.0/users/me"
+            },
+            "slack": {
+                "name": "Slack Team Communication", 
+                "icon": "💬",
+                "required_fields": ["bot_token", "webhook_url"],
+                "optional_fields": ["default_channel", "user_token"],
+                "status": "connected",
+                "test_endpoint": "https://slack.com/api/auth.test"
+            },
+            "stripe": {
+                "name": "Stripe Payment Processing",
+                "icon": "💳", 
+                "required_fields": ["secret_key", "publishable_key"],
+                "optional_fields": ["webhook_secret"],
+                "status": "disconnected",
+                "test_endpoint": "https://api.stripe.com/v1/account"
+            },
+            "twitter": {
+                "name": "Twitter/X Social Media",
+                "icon": "🐦",
+                "required_fields": ["api_key", "api_secret", "access_token", "access_token_secret"],
+                "optional_fields": ["bearer_token"],
+                "status": "connected", 
+                "test_endpoint": "https://api.twitter.com/2/users/me"
+            },
+            "google_sheets": {
+                "name": "Google Sheets",
+                "icon": "📊",
+                "required_fields": ["service_account_json"],
+                "optional_fields": ["default_spreadsheet_id"],
+                "status": "disconnected",
+                "test_endpoint": "https://sheets.googleapis.com/v4/spreadsheets"
+            },
+            "email": {
+                "name": "Email Service",
+                "icon": "📧",
+                "required_fields": ["smtp_host", "smtp_port", "username", "password"],
+                "optional_fields": ["from_name", "default_template"],
+                "status": "connected",
+                "test_endpoint": "smtp_connection_test"
+            },
+            "telegram": {
+                "name": "Telegram Bot",
+                "icon": "🤖",
+                "required_fields": ["bot_token"],
+                "optional_fields": ["webhook_url"],
+                "status": "disconnected",
+                "test_endpoint": "https://api.telegram.org/bot{token}/getMe"
+            },
+            "analytics": {
+                "name": "Google Analytics",
+                "icon": "📈",
+                "required_fields": ["property_id", "service_account_json"],
+                "optional_fields": ["default_date_range"],
+                "status": "disconnected",
+                "test_endpoint": "https://analyticsdata.googleapis.com/v1beta"
+            },
+            "trello": {
+                "name": "Trello Project Management",
+                "icon": "📌",
+                "required_fields": ["api_key", "token"],
+                "optional_fields": ["default_board_id"],
+                "status": "connected",
+                "test_endpoint": "https://api.trello.com/1/members/me"
+            },
+            "openai": {
+                "name": "OpenAI API",
+                "icon": "🤖",
+                "required_fields": ["api_key"],
+                "optional_fields": ["organization_id", "default_model"],
+                "status": "disconnected",
+                "test_endpoint": "https://api.openai.com/v1/models"
+            }
+        };
+
+        function updateStats() {
+            const connected = Object.values(connections).filter(c => c.status === 'connected').length;
+            const total = Object.keys(connections).length;
+            const disconnected = total - connected;
+            const successRate = total > 0 ? Math.round((connected / total) * 100) : 0;
+
+            document.getElementById('connected-count').textContent = connected;
+            document.getElementById('disconnected-count').textContent = disconnected;
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        }
+
+        function renderConnections() {
+            const grid = document.getElementById('connections-grid');
+            grid.innerHTML = '';
+
+            Object.entries(connections).forEach(([key, connection]) => {
+                const statusClass = connection.status === 'connected' ? 'status-connected' : 'status-disconnected';
+                const statusIcon = connection.status === 'connected' ? 'fa-check-circle' : 'fa-times-circle';
+                const statusText = connection.status === 'connected' ? 'Connected' : 'Not Connected';
+                const buttonText = connection.status === 'connected' ? 'Reconfigure' : 'Setup';
+                const buttonClass = connection.status === 'connected' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700';
+
+                const card = document.createElement('div');
+                card.className = 'connection-card bg-white rounded-lg shadow-md overflow-hidden';
+                card.innerHTML = `
+                    <div class="${statusClass} text-white p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">${connection.icon}</span>
+                                <div>
+                                    <h3 class="font-semibold text-lg">${connection.name}</h3>
+                                    <p class="text-sm opacity-90">${key.replace('_', ' ')}</p>
+                                </div>
+                            </div>
+                            <i class="fas ${statusIcon} text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm text-gray-600">Status</span>
+                            <span class="text-sm font-medium ${connection.status === 'connected' ? 'text-green-600' : 'text-red-600'}">${statusText}</span>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600 mb-2">Required Fields:</p>
+                            <div class="flex flex-wrap gap-2">
+                                ${connection.required_fields.map(field => `
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">${field}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="setupConnection('${key}')" class="${buttonClass} text-white px-4 py-2 rounded text-sm font-medium flex-1 transition-colors">
+                                <i class="fas fa-cog mr-2"></i>${buttonText}
+                            </button>
+                            <button onclick="testConnection('${key}')" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded text-sm transition-colors">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function setupConnection(connectionKey) {
+            const connection = connections[connectionKey];
+            document.getElementById('modal-title').textContent = `Setup ${connection.name}`;
+            
+            const formFields = document.getElementById('form-fields');
+            formFields.innerHTML = '';
+
+            // Add required fields
+            connection.required_fields.forEach(field => {
+                const div = document.createElement('div');
+                div.className = 'mb-4';
+                
+                const fieldType = field.includes('password') || field.includes('secret') || field.includes('token') ? 'password' : 'text';
+                const isTextarea = field.includes('json');
+                
+                div.innerHTML = `
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        ${field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} *
+                    </label>
+                    ${isTextarea ? 
+                        `<textarea name="${field}" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required placeholder="Paste your JSON configuration here"></textarea>` :
+                        `<input type="${fieldType}" name="${field}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required placeholder="Enter your ${field.replace('_', ' ')}">`
+                    }
+                `;
+                formFields.appendChild(div);
+            });
+
+            // Add optional fields
+            if (connection.optional_fields.length > 0) {
+                const separator = document.createElement('div');
+                separator.className = 'border-t pt-4 mb-4';
+                separator.innerHTML = '<h4 class="text-sm font-medium text-gray-600 mb-3">Optional Settings</h4>';
+                formFields.appendChild(separator);
+
+                connection.optional_fields.forEach(field => {
+                    const div = document.createElement('div');
+                    div.className = 'mb-4';
+                    div.innerHTML = `
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            ${field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </label>
+                        <input type="text" name="${field}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your ${field.replace('_', ' ')} (optional)">
+                    `;
+                    formFields.appendChild(div);
+                });
+            }
+
+            document.getElementById('setupModal').classList.remove('hidden');
+            
+            // Setup form submission
+            document.getElementById('connection-form').onsubmit = function(e) {
+                e.preventDefault();
+                saveConnection(connectionKey);
+            };
+        }
+
+        function saveConnection(connectionKey) {
+            // Simulate saving connection
+            console.log(`Saving connection for ${connectionKey}`);
+            
+            // Update connection status
+            connections[connectionKey].status = 'connected';
+            
+            // Close modal and refresh
+            closeModal();
+            updateStats();
+            renderConnections();
+            
+            // Show success message
+            showNotification('Connection saved and tested successfully!', 'success');
+        }
+
+        function testConnection(connectionKey) {
+            const connection = connections[connectionKey];
+            console.log(`Testing connection for ${connectionKey}`);
+            
+            // Simulate testing
+            connection.status = 'testing';
+            renderConnections();
+            
+            setTimeout(() => {
+                // Simulate test result
+                const success = Math.random() > 0.3; // 70% success rate
+                connection.status = success ? 'connected' : 'disconnected';
+                updateStats();
+                renderConnections();
+                
+                const message = success ? 
+                    `${connection.name} connection test successful!` : 
+                    `${connection.name} connection test failed. Please check your credentials.`;
+                showNotification(message, success ? 'success' : 'error');
+            }, 2000);
+        }
+
+        function testAllConnections() {
+            console.log('Testing all connections...');
+            Object.keys(connections).forEach(key => {
+                setTimeout(() => testConnection(key), Math.random() * 1000);
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('setupModal').classList.add('hidden');
+        }
+
+        function refreshDashboard() {
+            console.log('Refreshing dashboard...');
+            updateStats();
+            renderConnections();
+            showNotification('Dashboard refreshed!', 'info');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-transform`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            renderConnections();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('setupModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

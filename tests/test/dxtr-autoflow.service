@@ -1,0 +1,31 @@
+[Unit]
+Description=DXTR AutoFlow - Workflow Automation Platform
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=dxtr
+Group=dxtr
+WorkingDirectory=/opt/dxtr-autoflow
+Environment=PATH=/opt/dxtr-autoflow/venv/bin
+ExecStart=/opt/dxtr-autoflow/venv/bin/python main.py
+Restart=always
+RestartSec=10
+
+# Environment file
+EnvironmentFile=/opt/dxtr-autoflow/.env
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dxtr-autoflow
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/dxtr-autoflow/logs
+
+[Install]
+WantedBy=multi-user.target

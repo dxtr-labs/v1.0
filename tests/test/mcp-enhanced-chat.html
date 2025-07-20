@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Automation Engine - Enhanced Chat Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+        }
+        .preview-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            background: #f9fafb;
+        }
+        .preview-card.email {
+            border-color: #3b82f6;
+        }
+        .preview-card.zoom {
+            border-color: #10b981;
+        }
+        .preview-card.slack {
+            border-color: #8b5cf6;
+        }
+        .preview-card.sms {
+            border-color: #6b7280;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto p-6 max-w-4xl">
+        <h1 class="text-3xl font-bold mb-6 text-center">
+            <i class="fas fa-robot mr-2 text-blue-600"></i>
+            MCP Automation Engine
+        </h1>
+        
+        <!-- MCP Prompt Injection Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">
+                <i class="fas fa-magic mr-2 text-purple-600"></i>
+                MCP Prompt Injection
+            </h2>
+            <textarea 
+                id="mcpPrompt" 
+                placeholder="Write your custom MCP prompt here to guide the AI's behavior and understanding..."
+                class="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            ></textarea>
+            <p class="text-sm text-gray-600 mt-2">
+                💡 Use this to customize how MCP understands your requests. For example: "Always be very detailed with email content" or "Prefer morning meetings"
+            </p>
+        </div>
+
+        <!-- Agent Selection -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">
+                <i class="fas fa-user-robot mr-2 text-green-600"></i>
+                Agent Configuration
+            </h2>
+            <div class="flex gap-4">
+                <input 
+                    type="text" 
+                    id="agentId" 
+                    placeholder="Agent ID (default: mcp-agent)" 
+                    value="mcp-agent"
+                    class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                <button onclick="loadAgentHistory()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-history mr-2"></i>Load History
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">
+                <i class="fas fa-comments mr-2 text-blue-600"></i>
+                Chat & Automation
+            </h2>
+            
+            <!-- Chat Messages -->
+            <div id="chatContainer" class="chat-container border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50">
+                <div class="text-center text-gray-500 py-8">
+                    <i class="fas fa-robot text-4xl mb-2"></i>
+                    <p>Start a conversation with MCP!</p>
+                    <p class="text-sm">Try: "Send an email to john@example.com about the project update"</p>
+                </div>
+            </div>
+            
+            <!-- Chat Input -->
+            <div class="flex gap-3">
+                <input 
+                    type="text" 
+                    id="chatMessage" 
+                    placeholder="Type your automation request..."
+                    class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    onkeypress="if(event.key==='Enter') sendMessage()"
+                >
+                <button onclick="sendMessage()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-paper-plane mr-2"></i>Send
+                </button>
+            </div>
+        </div>
+
+        <!-- Workflow Preview Section -->
+        <div id="workflowPreview" class="mt-6"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentWorkflow = null;
+        let messageHistory = [];
+
+        async function sendMessage(confirmWorkflow = false) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageInput = document.getElementById('chatMessage');
+            const mcpPrompt = document.getElementById('mcpPrompt').value;
+            const agentId = document.getElementById('agentId').value || 'mcp-agent';
+            
+            let message = '';
+            if (confirmWorkflow) {
+                message = 'yes, confirm and run workflow';
+            } else {
+                message = messageInput.value.trim();
+                if (!message) return;
+                messageInput.value = '';
+            }
+
+            // Add user message to chat
+            if (!confirmWorkflow) {
+                addMessageToChat('user', message);
+            }
+
+            try {
+                const requestBody = {
+                    message: message,
+                    mcpPrompt: mcpPrompt,
+                    agentId: agentId
+                };
+
+                // If confirming workflow, include the stored workflow
+                if (confirmWorkflow && currentWorkflow) {
+                    requestBody.stored_workflow = currentWorkflow;
+                }
+
+                const response = await fetch(`${API_BASE}/api/chat/mcpai`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+
+                if (data.response_type === 'workflow_preview') {
+                    // Store workflow for confirmation
+                    currentWorkflow = data.workflow;
+                    
+                    // Add assistant message
+                    addMessageToChat('assistant', data.message);
+                    
+                    // Show workflow preview
+                    showWorkflowPreview(data.workflow_preview);
+                    
+                } else if (data.response_type === 'execution_complete') {
+                    addMessageToChat('assistant', data.message);
+                    showExecutionResults(data.result);
+                    currentWorkflow = null; // Clear stored workflow
+                    document.getElementById('workflowPreview').innerHTML = '';
+                    
+                } else if (checkForEmailPreview(data)) {
+                    // Handle email preview - enhanced detection
+                    console.log('📧 Email preview detected!', data);
+                    
+                    const emailPreviewInfo = checkForEmailPreview(data);
+                    console.log('📧 Email preview info:', emailPreviewInfo);
+                    
+                    // Add the assistant response first
+                    addMessageToChat('assistant', data.response || emailPreviewInfo.message || '📧 Email preview ready for review.');
+                    
+                    // Show the email preview
+                    showEmailPreview(emailPreviewInfo.preview_data, emailPreviewInfo.automation_result);
+                    
+                } else {
+                    // Standard response or error
+                    addMessageToChat('assistant', data.response || data.message || 'Sorry, I encountered an error.');
+                }
+
+            } catch (error) {
+                console.error('Chat error:', error);
+                addMessageToChat('assistant', 'Sorry, I encountered a connection error. Please try again.');
+            }
+        }
+
+        // Enhanced email preview detection function
+        function checkForEmailPreview(data) {
+            console.log('🔍 Checking for email preview in data:', data);
+            
+            // Method 1: Direct type check
+            if (data && data.type === 'email_preview') {
+                console.log('✅ Found email preview via direct type check');
+                return {
+                    preview_data: data.preview_data,
+                    automation_result: data.automation_result,
+                    message: data.message
+                };
+            }
+            
+            // Method 2: Check the actual backend response structure from logs
+            // The response has: data.execution.execution.preview_data and data.execution.execution.action_required
+            if (data && data.execution && data.execution.execution && data.execution.execution.preview_data) {
+                console.log('✅ Found email preview via execution.execution.preview_data (nested structure)');
+                return {
+                    preview_data: data.execution.execution.preview_data,
+                    automation_result: data.execution.automation_result,
+                    action_required: data.execution.execution.action_required,
+                    message: data.execution.message
+                };
+            }
+            
+            // Method 3: Check for root level preview_data with action_required
+            if (data && data.preview_data && data.action_required === 'email_preview_confirmation') {
+                console.log('✅ Found email preview via root level preview_data');
+                return {
+                    preview_data: data.preview_data,
+                    automation_result: data.automation_result,
+                    action_required: data.action_required,
+                    message: data.message
+                };
+            }
+            
+            // Method 4: Check automation_result structure
+            if (data && data.automation_result && data.automation_result.execution) {
+                const execution = data.automation_result.execution;
+                if (execution.preview_data && execution.action_required === 'email_preview_confirmation') {
+                    console.log('✅ Found email preview via automation_result.execution');
+                    return {
+                        preview_data: execution.preview_data,
+                        automation_result: data.automation_result,
+                        action_required: execution.action_required,
+                        message: data.message
+                    };
+                }
+            }
+            
+            // Method 5: Check execution at first level
+            if (data && data.execution && data.execution.preview_data) {
+                console.log('✅ Found email preview via execution.preview_data');
+                return {
+                    preview_data: data.execution.preview_data,
+                    automation_result: data.execution.automation_result,
+                    action_required: data.execution.action_required || 'email_preview_confirmation',
+                    message: data.execution.message || data.message
+                };
+            }
+            
+            // Method 6: Check for text containing email preview indicators
+            if (data && data.response && typeof data.response === 'string') {
+                if (data.response.includes('Click \'Confirm & Send\'') || 
+                    data.response.includes('email preview') ||
+                    data.response.includes('*Click \'Confirm & Send\' to send this email')) {
+                    console.log('✅ Found email preview via text indicators in response');
+                    
+                    // Try to extract preview data from nested structures
+                    let preview_data = null;
+                    let automation_result = null;
+                    
+                    // Check all possible nested locations
+                    if (data.execution && data.execution.execution && data.execution.execution.preview_data) {
+                        preview_data = data.execution.execution.preview_data;
+                        automation_result = data.execution.automation_result;
+                    } else if (data.execution && data.execution.preview_data) {
+                        preview_data = data.execution.preview_data;
+                        automation_result = data.execution.automation_result;
+                    } else if (data.preview_data) {
+                        preview_data = data.preview_data;
+                        automation_result = data.automation_result;
+                    }
+                    
+                    if (preview_data) {
+                        return {
+                            preview_data: preview_data,
+                            automation_result: automation_result,
+                            action_required: 'email_preview_confirmation',
+                            message: data.response
+                        };
+                    }
+                }
+            }
+            
+            // Method 7: Deep scan for any preview_data in nested objects
+            if (data && typeof data === 'object') {
+                function deepScanForPreview(obj, path = '') {
+                    for (const key in obj) {
+                        const value = obj[key];
+                        const currentPath = path ? `${path}.${key}` : key;
+                        
+                        if (value && typeof value === 'object') {
+                            if (value.preview_data && value.to_email) {
+                                console.log(`✅ Found email preview via deep scan at: ${currentPath}`);
+                                return {
+                                    preview_data: value.preview_data,
+                                    automation_result: value.automation_result || obj.automation_result,
+                                    action_required: value.action_required || 'email_preview_confirmation',
+                                    message: data.response || data.message
+                                };
+                            }
+                            
+                            // Check one level deeper
+                            const deepResult = deepScanForPreview(value, currentPath);
+                            if (deepResult) return deepResult;
+                        }
+                    }
+                    return null;
+                }
+                
+                const deepResult = deepScanForPreview(data);
+                if (deepResult) return deepResult;
+            }
+            
+            // Method 8: Check for backend response with email_content + recipient (the actual format being returned)
+            if (data && data.email_content && data.recipient) {
+                console.log('✅ Found email preview via email_content + recipient (direct backend format)');
+                return {
+                    preview_data: {
+                        to_email: data.recipient,
+                        subject: data.email_subject || 'Generated Email',
+                        content: data.email_content
+                    },
+                    automation_result: data,
+                    action_required: 'email_preview_confirmation',
+                    message: data.message || 'Email ready for review'
+                };
+            }
+            
+            console.log('❌ No email preview found in data');
+            return null;
+        }
+
+        function addMessageToChat(role, content) {
+            const chatContainer = document.getElementById('chatContainer');
+            
+            // Clear welcome message if it exists
+            if (chatContainer.querySelector('.text-center')) {
+                chatContainer.innerHTML = '';
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `mb-4 ${role === 'user' ? 'text-right' : 'text-left'}`;
+            
+            const messageBubble = document.createElement('div');
+            messageBubble.className = `inline-block max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                role === 'user' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-800'
+            }`;
+            
+            messageBubble.innerHTML = `
+                <div class="font-semibold text-sm mb-1">${role === 'user' ? 'You' : 'MCP'}</div>
+                <div>${content}</div>
+            `;
+            
+            messageDiv.appendChild(messageBubble);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showWorkflowPreview(preview) {
+            const previewContainer = document.getElementById('workflowPreview');
+            
+            let previewHTML = `
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4">
+                        <i class="fas fa-eye mr-2 text-green-600"></i>
+                        Workflow Preview
+                    </h2>
+                    <div class="grid gap-4">
+            `;
+
+            preview.nodes.forEach(node => {
+                const preview_data = node.preview;
+                let cardClass = 'preview-card';
+                
+                if (node.type === 'emailSend') {
+                    cardClass += ' email';
+                    previewHTML += `
+                        <div class="${cardClass}">
+                            <h3 class="font-bold text-lg mb-2">${preview_data.title}</h3>
+                            <div class="grid grid-cols-2 gap-2 text-sm mb-3">
+                                <div><strong>To:</strong> ${preview_data.to}</div>
+                                <div><strong>Subject:</strong> ${preview_data.subject}</div>
+                            </div>
+                            <div class="border border-gray-300 rounded p-2 bg-white">
+                                ${preview_data.html_preview}
+                            </div>
+                        </div>
+                    `;
+                } else if (node.type === 'zoomMeeting') {
+                    cardClass += ' zoom';
+                    previewHTML += `
+                        <div class="${cardClass}">
+                            <h3 class="font-bold text-lg mb-2">${preview_data.title}</h3>
+                            <div class="text-sm space-y-1">
+                                <div><strong>Topic:</strong> ${preview_data.topic}</div>
+                                <div><strong>Time:</strong> ${preview_data.start_time}</div>
+                                <div><strong>Duration:</strong> ${preview_data.duration} minutes</div>
+                                <div><strong>Participants:</strong> ${preview_data.participants.join(', ')}</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (node.type === 'slack') {
+                    cardClass += ' slack';
+                    previewHTML += `
+                        <div class="${cardClass}">
+                            <h3 class="font-bold text-lg mb-2">${preview_data.title}</h3>
+                            <div class="text-sm space-y-1">
+                                <div><strong>Channel:</strong> ${preview_data.channel}</div>
+                                <div><strong>Message:</strong> "${preview_data.message}"</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (node.type === 'twilio') {
+                    cardClass += ' sms';
+                    previewHTML += `
+                        <div class="${cardClass}">
+                            <h3 class="font-bold text-lg mb-2">${preview_data.title}</h3>
+                            <div class="text-sm space-y-1">
+                                <div><strong>To:</strong> ${preview_data.to}</div>
+                                <div><strong>Message:</strong> "${preview_data.message}"</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Generic preview for other node types
+                    previewHTML += `
+                        <div class="${cardClass}">
+                            <h3 class="font-bold text-lg mb-2">${preview_data.title}</h3>
+                            <div class="text-sm">
+                                <pre class="bg-gray-100 p-2 rounded text-xs overflow-x-auto">${JSON.stringify(preview_data.parameters, null, 2)}</pre>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            previewHTML += `
+                    </div>
+                    <div class="mt-6 flex gap-3 justify-center">
+                        <button onclick="sendMessage(true)" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
+                            <i class="fas fa-check mr-2"></i>Confirm & Execute
+                        </button>
+                        <button onclick="cancelWorkflow()" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            previewContainer.innerHTML = previewHTML;
+        }
+
+        function showExecutionResults(results) {
+            const previewContainer = document.getElementById('workflowPreview');
+            
+            let resultHTML = `
+                <div class="bg-green-50 border border-green-200 rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-green-800">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Execution Results
+                    </h2>
+                    <div class="space-y-3">
+            `;
+
+            results.results.forEach(result => {
+                const success = result.result.success;
+                resultHTML += `
+                    <div class="p-3 rounded-lg ${success ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border">
+                        <div class="font-semibold ${success ? 'text-green-800' : 'text-red-800'}">
+                            ${result.node_type} (${result.node_id})
+                        </div>
+                        <div class="text-sm ${success ? 'text-green-700' : 'text-red-700'}">
+                            ${result.result.message || result.result.error}
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultHTML += `
+                    </div>
+                </div>
+            `;
+
+            previewContainer.innerHTML = resultHTML;
+        }
+
+        function cancelWorkflow() {
+            currentWorkflow = null;
+            document.getElementById('workflowPreview').innerHTML = '';
+            addMessageToChat('assistant', 'Workflow cancelled. Feel free to create a new automation request.');
+        }
+
+        function showEmailPreview(previewData, automationResult) {
+            console.log('=== EMAIL PREVIEW FUNCTION CALLED ===');
+            console.log('Preview data:', previewData);
+            console.log('Automation result:', automationResult);
+            
+            const previewContainer = document.getElementById('workflowPreview');
+            console.log('Preview container found:', previewContainer);
+            
+            if (!previewData) {
+                console.error('No preview data provided');
+                addMessageToChat('assistant', '❌ Error: No email preview data found');
+                return;
+            }
+            
+            // Add a visible indicator that the function was called
+            addMessageToChat('assistant', '📧 Displaying email preview...');
+            
+            let previewHTML = `
+                <div class="bg-blue-50 border border-blue-200 rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-blue-800">
+                        <i class="fas fa-envelope mr-2"></i>
+                        Email Preview
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">To:</label>
+                                <div class="bg-white p-2 rounded border">${previewData.to_email || 'N/A'}</div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Subject:</label>
+                                <input type="text" id="emailSubjectEditor" 
+                                       class="bg-white p-2 rounded border w-full" 
+                                       value="${previewData.subject || 'N/A'}" />
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Content:</label>
+                            <textarea id="emailContentEditor" 
+                                      class="bg-white p-4 rounded border w-full h-64 resize-y font-mono text-sm"
+                                      placeholder="Email content will appear here...">${previewData.content || previewData.text_content || 'No content available'}</textarea>
+                        </div>
+                        
+                        ${previewData.html_content ? `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">HTML Preview:</label>
+                            <div class="bg-white p-4 rounded border max-h-96 overflow-y-auto">
+                                <iframe srcdoc="${previewData.html_content.replace(/"/g, '&quot;')}" 
+                                        style="width: 100%; height: 300px; border: none;"
+                                        sandbox="allow-same-origin"></iframe>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="flex gap-4 mt-6 justify-center">
+                        <button onclick="confirmEmailSend()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-semibold">
+                            <i class="fas fa-paper-plane mr-2"></i>Confirm & Send
+                        </button>
+                        <button onclick="editEmail()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+                            <i class="fas fa-edit mr-2"></i>Edit
+                        </button>
+                        <button onclick="cancelEmailSend()" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition font-semibold">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            console.log('Setting preview container innerHTML...');
+            previewContainer.innerHTML = previewHTML;
+            console.log('Preview container after setting innerHTML:', previewContainer.innerHTML.length, 'characters');
+            
+            // Store the preview data for sending
+            window.currentEmailPreview = { previewData, automationResult };
+            
+            console.log('=== EMAIL PREVIEW SETUP COMPLETE ===');
+        }
+
+        async function confirmEmailSend() {
+            if (!window.currentEmailPreview) {
+                addMessageToChat('assistant', 'No email preview found. Please try again.');
+                return;
+            }
+
+            // Get the edited content from the form fields
+            const editedSubject = document.getElementById('emailSubjectEditor')?.value || '';
+            const editedContent = document.getElementById('emailContentEditor')?.value || '';
+            const { previewData } = window.currentEmailPreview;
+            
+            if (!editedContent.trim()) {
+                addMessageToChat('assistant', '❌ Email content cannot be empty.');
+                return;
+            }
+            
+            addMessageToChat('assistant', '📤 Sending email with your edits...');
+            
+            try {
+                // Use the backend confirmation endpoint that we know works
+                const response = await fetch(`${API_BASE}/api/chat/mcpai`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: "yes",  // Confirm the email send
+                        email_confirmation: {
+                            recipient: previewData.to_email,
+                            subject: editedSubject,
+                            content: editedContent,
+                            confirmed: true
+                        }
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success !== false) {
+                    addMessageToChat('assistant', `✅ Email sent successfully to ${previewData.to_email}!`);
+                    addMessageToChat('assistant', `📧 Subject: ${editedSubject}`);
+                } else {
+                    addMessageToChat('assistant', `❌ Failed to send email: ${result.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Email send error:', error);
+                addMessageToChat('assistant', '❌ Error sending email. Please try again.');
+            }
+            
+            // Clean up
+            document.getElementById('workflowPreview').innerHTML = '';
+            window.currentEmailPreview = null;
+        }
+
+        function cancelEmailSend() {
+            document.getElementById('workflowPreview').innerHTML = '';
+            window.currentEmailPreview = null;
+            addMessageToChat('assistant', 'Email sending cancelled. Feel free to create a new automation request.');
+        }
+
+        function editEmail() {
+            addMessageToChat('assistant', '✏️ You can edit the email content directly in the preview above. The subject and content fields are editable - just click and modify them, then click "Confirm & Send" when ready.');
+        }
+
+        async function loadAgentHistory() {
+            // Placeholder for loading agent history
+            addMessageToChat('assistant', 'Agent history loaded. Ready for new automation requests!');
+        }
+
+        // Add some example MCP prompts
+        function setExamplePrompt(example) {
+            const mcpPrompt = document.getElementById('mcpPrompt');
+            switch(example) {
+                case 'detailed':
+                    mcpPrompt.value = 'Always generate detailed, professional email content. Include proper greetings, context, and clear next steps.';
+                    break;
+                case 'morning':
+                    mcpPrompt.value = 'Prefer scheduling meetings in the morning (9 AM - 12 PM). Default meeting duration to 30 minutes unless specified.';
+                    break;
+                case 'formal':
+                    mcpPrompt.value = 'Use formal, business-appropriate language for all communications. Address recipients professionally.';
+                    break;
+            }
+        }
+
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add example prompt buttons
+            const mcpSection = document.querySelector('textarea#mcpPrompt').parentElement;
+            const exampleButtons = document.createElement('div');
+            exampleButtons.className = 'mt-2 flex gap-2';
+            exampleButtons.innerHTML = `
+                <span class="text-sm text-gray-600">Quick examples:</span>
+                <button onclick="setExamplePrompt('detailed')" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Detailed Emails</button>
+                <button onclick="setExamplePrompt('morning')" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Morning Meetings</button>
+                <button onclick="setExamplePrompt('formal')" class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Formal Tone</button>
+            `;
+            mcpSection.appendChild(exampleButtons);
+        });
+    </script>
+</body>
+</html>

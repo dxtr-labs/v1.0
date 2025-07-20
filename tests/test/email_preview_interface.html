@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXTR Labs Email Preview System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .form-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-section h2 {
+            color: #6366f1;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-send {
+            background: linear-gradient(135deg, #10b981, #059669);
+            margin-left: 15px;
+        }
+        
+        .btn-cancel {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            margin-left: 15px;
+        }
+        
+        .preview-section {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .preview-section.show {
+            display: block;
+        }
+        
+        .preview-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        
+        .preview-item {
+            padding: 15px;
+            background: linear-gradient(135deg, #374151, #4b5563);
+            border-radius: 8px;
+        }
+        
+        .preview-item strong {
+            color: #6366f1;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .email-preview {
+            background: #ffffff;
+            color: #333333;
+            border-radius: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 2px solid #6366f1;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .status-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .status-info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 DXTR LABS</h1>
+            <p>Email Preview & Confirmation System</p>
+        </div>
+        
+        <div class="form-section">
+            <h2>📝 Compose Email Request</h2>
+            <div class="input-group">
+                <label for="emailRequest">Email Request (Natural Language)</label>
+                <textarea 
+                    id="emailRequest" 
+                    placeholder="e.g., Hey Sam, we are DXTR Labs building virtual workforce. AI- explain advantage of using virtual workforce and sell our product to user@example.com"
+                ></textarea>
+            </div>
+            <button class="btn" onclick="generatePreview()">
+                <span id="previewBtnText">🔍 Generate Preview</span>
+            </button>
+        </div>
+        
+        <div id="statusMessage"></div>
+        
+        <div id="previewSection" class="preview-section">
+            <h2>📧 Email Preview</h2>
+            <div id="previewInfo" class="preview-info"></div>
+            <div id="emailPreview" class="email-preview"></div>
+            <div style="margin-top: 25px; text-align: center;">
+                <button class="btn btn-send" onclick="sendEmail()">
+                    <span id="sendBtnText">✅ Send Email</span>
+                </button>
+                <button class="btn btn-cancel" onclick="cancelEmail()">
+                    ❌ Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentPreview = null;
+        
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        async function generatePreview() {
+            const emailRequest = document.getElementById('emailRequest').value.trim();
+            
+            if (!emailRequest) {
+                showStatus('❌ Please enter an email request', 'error');
+                return;
+            }
+            
+            const previewBtn = document.getElementById('previewBtnText');
+            previewBtn.innerHTML = '<span class="loading"></span>Generating Preview...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/email/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: emailRequest
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentPreview = data.preview;
+                    displayPreview(data.preview);
+                    showStatus('✅ Email preview generated successfully!', 'success');
+                } else {
+                    showStatus(`❌ Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Connection error: ${error.message}`, 'error');
+            } finally {
+                previewBtn.innerHTML = '🔍 Generate Preview';
+            }
+        }
+        
+        function displayPreview(preview) {
+            const previewSection = document.getElementById('previewSection');
+            const previewInfo = document.getElementById('previewInfo');
+            const emailPreview = document.getElementById('emailPreview');
+            
+            // Show preview info
+            previewInfo.innerHTML = `
+                <div class="preview-item">
+                    <strong>📧 To:</strong>
+                    ${preview.to_email}
+                </div>
+                <div class="preview-item">
+                    <strong>👤 Recipient:</strong>
+                    ${preview.recipient_name}
+                </div>
+                <div class="preview-item">
+                    <strong>📬 Subject:</strong>
+                    ${preview.subject}
+                </div>
+                <div class="preview-item">
+                    <strong>🎨 Template:</strong>
+                    ${preview.is_premium_template ? 'Premium DXTR Labs' : 'Standard'}
+                </div>
+            `;
+            
+            // Show email HTML preview
+            emailPreview.innerHTML = preview.html_content;
+            
+            // Show the preview section
+            previewSection.classList.add('show');
+        }
+        
+        async function sendEmail() {
+            if (!currentPreview) {
+                showStatus('❌ No email preview available', 'error');
+                return;
+            }
+            
+            const sendBtn = document.getElementById('sendBtnText');
+            sendBtn.innerHTML = '<span class="loading"></span>Sending Email...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/email/send-premium', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        to_email: currentPreview.to_email,
+                        subject: currentPreview.subject,
+                        html_content: currentPreview.html_content,
+                        text_content: currentPreview.text_content,
+                        confirmed: true
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus('🎉 Email sent successfully!', 'success');
+                    cancelEmail(); // Hide preview section
+                } else {
+                    showStatus(`❌ Failed to send email: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Connection error: ${error.message}`, 'error');
+            } finally {
+                sendBtn.innerHTML = '✅ Send Email';
+            }
+        }
+        
+        function cancelEmail() {
+            const previewSection = document.getElementById('previewSection');
+            previewSection.classList.remove('show');
+            currentPreview = null;
+            showStatus('📝 Email cancelled. You can create a new preview.', 'info');
+        }
+        
+        // Example requests
+        document.addEventListener('DOMContentLoaded', function() {
+            const examples = [
+                "Hey Sam, we are DXTR Labs building virtual workforce. AI- explain advantage of using virtual workforce and sell our product to customer@example.com",
+                "Send good morning email to team@company.com",
+                "Send reminder about meeting tomorrow to john@email.com"
+            ];
+            
+            // Add example button for demo
+            const formSection = document.querySelector('.form-section');
+            const exampleBtn = document.createElement('button');
+            exampleBtn.className = 'btn';
+            exampleBtn.style.marginLeft = '15px';
+            exampleBtn.innerHTML = '💡 Load Example';
+            exampleBtn.onclick = function() {
+                document.getElementById('emailRequest').value = examples[0];
+            };
+            formSection.appendChild(exampleBtn);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "5bc812b2": {
+    "id": "sales_agent_123",
+    "name": "Sales Assistant",
+    "role": "Email Marketing Specialist",
+    "description": "Agent created from frontend: Sales Assistant - Email Marketing Specialist",
+    "mode": "Active",
+    "created_at": "2025-07-13T21:04:19.367745",
+    "updated_at": "2025-07-13T21:04:19.367745",
+    "config": {
+      "temperature": 0.7,
+      "max_tokens": 1000,
+      "system_prompt": "You are Sales Assistant, a Email Marketing Specialist. Agent created from frontend: Sales Assistant - Email Marketing Specialist",
+      "auto_response": true,
+      "email_signature": "Best regards,\nSales Assistant\nEmail Marketing Specialist"
+    },
+    "chat_history": [],
+    "capabilities": [
+      "email",
+      "automation",
+      "chat"
+    ],
+    "user_id": "default_user"
+  },
+  "sales_agent_123": {
+    "id": "sales_agent_123",
+    "name": "Sales Assistant",
+    "role": "Email Marketing Specialist",
+    "description": "Agent created from frontend: Sales Assistant - Email Marketing Specialist",
+    "mode": "Active",
+    "created_at": "2025-07-13T21:04:19.367745",
+    "updated_at": "2025-07-13T21:04:19.367745",
+    "config": {
+      "temperature": 0.7,
+      "max_tokens": 1000,
+      "system_prompt": "You are Sales Assistant, a Email Marketing Specialist. Agent created from frontend: Sales Assistant - Email Marketing Specialist",
+      "auto_response": true,
+      "email_signature": "Best regards,\nSales Assistant\nEmail Marketing Specialist"
+    },
+    "chat_history": [],
+    "capabilities": [
+      "email",
+      "automation",
+      "chat"
+    ],
+    "user_id": "default_user"
+  }
+}

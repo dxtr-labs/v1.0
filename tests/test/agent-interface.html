@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .chat-message {
+            transition: all 0.3s ease;
+        }
+        .chat-message:hover {
+            transform: translateX(5px);
+        }
+        .loading-dots::after {
+            content: '...';
+            animation: dots 1s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-800">AI Agent Dashboard</h1>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <span id="connectionStatus" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-200">
+                        Connecting...
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex-1 flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <div class="bg-white w-full md:w-64 shadow-lg md:h-full p-4">
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold mb-2">Active Agents</h2>
+                <div id="agentList" class="space-y-2">
+                    <!-- Agent list items will be inserted here -->
+                </div>
+                <button onclick="createNewAgent()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    Create New Agent
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Chat Area -->
+            <div class="flex-1 bg-white m-4 rounded-lg shadow-lg flex flex-col">
+                <div id="chatHeader" class="p-4 border-b">
+                    <h2 class="text-xl font-semibold">Chat with Agent</h2>
+                    <p id="agentDescription" class="text-sm text-gray-600">Select an agent to start chatting</p>
+                </div>
+                
+                <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- Chat messages will appear here -->
+                </div>
+
+                <div class="border-t p-4">
+                    <form id="chatForm" onsubmit="sendMessage(event)" class="flex space-x-4">
+                        <input 
+                            type="text" 
+                            id="messageInput"
+                            class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Type your message..."
+                            disabled
+                        >
+                        <button 
+                            type="submit"
+                            id="sendButton"
+                            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg disabled:opacity-50"
+                            disabled
+                        >
+                            Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Workflow Preview -->
+            <div id="workflowPreview" class="hidden bg-white m-4 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-2">Current Workflow</h3>
+                <div id="workflowContent" class="prose max-w-none">
+                    <!-- Workflow content will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for creating new agent -->
+    <div id="newAgentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <h2 class="text-xl font-bold mb-4">Create New Agent</h2>
+            <form id="newAgentForm" onsubmit="submitNewAgent(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" id="agentName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Role</label>
+                    <input type="text" id="agentRole" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Personality Traits (comma-separated)</label>
+                    <input type="text" id="agentPersonality" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Expectations</label>
+                    <textarea id="agentExpectations" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeNewAgentModal()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                        Create
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket handling
+        const socket = new WebSocket('ws://localhost:8080/ws/agent');
+        let currentAgentId = null;
+        
+        socket.onopen = () => {
+            console.log('WebSocket connected');
+        };
+        
+        socket.onclose = () => {
+            console.log('WebSocket disconnected');
+            document.getElementById('connectionStatus').innerHTML = 'Disconnected';
+            document.getElementById('connectionStatus').classList.remove('bg-gray-200', 'bg-green-200', 'text-green-800');
+            document.getElementById('connectionStatus').classList.add('bg-red-200', 'text-red-800');
+        };
+        
+        socket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+        
+        socket.onmessage = async (event) => {
+            try {
+                console.log('WebSocket message:', event.data);
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'response') {
+                    addMessage('assistant', data.message);
+                } else if (data.type === 'connection') {
+                    document.getElementById('connectionStatus').innerHTML = 'Connected';
+                    document.getElementById('connectionStatus').classList.remove('bg-gray-200');
+                    document.getElementById('connectionStatus').classList.add('bg-green-200', 'text-green-800');
+                    await loadAgents(); // Initial load of agents
+                } else if (data.type === 'agents_updated' && Array.isArray(data.agents)) {
+                    // Full list update
+                    console.log('Full agent list update:', data.agents);
+                    await updateAgentList(data.agents);
+                } else if (data.type === 'agent_created' && data.agent) {
+                    // Single agent update
+                    console.log('New agent created:', data.agent);
+                    await updateAgentList(data.agent);
+                }
+            } catch (error) {
+                console.error('Error handling WebSocket message:', error);
+            }
+        };
+
+        // Update the agent list in the UI
+        async function updateAgentList(agents) {
+            console.log('Updating agent list:', agents);
+            const agentList = document.getElementById('agentList');
+            
+            // Handle single agent update or array of agents
+            if (!Array.isArray(agents)) {
+                if (agents && typeof agents === 'object') {
+                    // Single agent update - append to existing list
+                    console.log('Adding single agent to list:', agents);
+                    const agentElement = document.createElement('div');
+                    agentElement.className = 'p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition duration-200';
+                    agentElement.dataset.agentId = agents.agent_id;
+                    agentElement.onclick = () => selectAgent(agents.agent_id);
+                    agentElement.innerHTML = `
+                        <h3 class="font-medium">${agents.agent_name}</h3>
+                        <p class="text-sm text-gray-600">${agents.agent_role}</p>
+                    `;
+                    agentList.appendChild(agentElement);
+                    
+                    // Auto-select the new agent
+                    selectAgent(agents.agent_id);
+                    return;
+                }
+                console.error('Expected agents to be an array or single agent object:', agents);
+                return;
+            }
+            
+            // Full list update
+            agentList.innerHTML = '';
+            agents.forEach(agent => {
+                console.log('Creating element for agent:', agent);
+                const agentElement = document.createElement('div');
+                agentElement.className = 'p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition duration-200';
+                agentElement.dataset.agentId = agent.agent_id;
+                agentElement.onclick = () => selectAgent(agent.agent_id);
+                agentElement.innerHTML = `
+                    <h3 class="font-medium">${agent.agent_name}</h3>
+                    <p class="text-sm text-gray-600">${agent.agent_role}</p>
+                `;
+                if (agent.agent_id === currentAgentId) {
+                    agentElement.classList.add('bg-blue-50', 'border-blue-500');
+                }
+                agentList.appendChild(agentElement);
+            });
+
+            if (agents.length === 0) {
+                console.log('No agents found');
+                agentList.innerHTML = '<div class="p-3 text-gray-500">No agents found. Create one to get started.</div>';
+            }
+        }
+
+        // Load the list of agents
+        async function loadAgents() {
+            try {
+                console.log('Loading agents...');
+                const response = await fetch('http://localhost:8080/api/agents');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const agents = await response.json();
+                await updateAgentList(agents);
+                
+                // Select the most recently created agent
+                if (agents.length > 0) {
+                    const latestAgent = agents[agents.length - 1];
+                    await selectAgent(latestAgent.agent_id);
+                }
+            } catch (error) {
+                console.error('Error loading agents:', error);
+                const agentList = document.getElementById('agentList');
+                agentList.innerHTML = '<div class="p-3 text-red-500">Error loading agents. Please try again.</div>';
+            }
+        }
+
+        // Select an agent to chat with
+        async function selectAgent(agentId) {
+            try {
+                console.log('Selecting agent:', agentId);
+                
+                // Handle either object or direct ID format
+                const id = typeof agentId === 'object' ? agentId.id : agentId;
+                
+                // Find the agent in the current agent list first
+                const agents = document.querySelectorAll('#agentList > div');
+                let selectedAgent = null;
+                
+                for (const el of agents) {
+                    const agentName = el.querySelector('h3.font-medium');
+                    const agentRole = el.querySelector('p.text-sm');
+                    
+                    // Clear previous selection
+                    el.classList.remove('bg-blue-50', 'border-blue-500');
+                    
+                    if (agentName && agentRole) {
+                        // Try to match by name or by role
+                        if ((typeof agentId === 'object' && agentName.textContent === agentId.name) ||
+                            (typeof agentId !== 'object' && el.dataset.agentId === String(id))) {
+                            selectedAgent = {
+                                name: agentName.textContent,
+                                role: agentRole.textContent
+                            };
+                            el.classList.add('bg-blue-50', 'border-blue-500');
+                        }
+                    }
+                }
+                
+                if (selectedAgent) {
+                    currentAgentId = id;
+                    document.getElementById('agentDescription').textContent = 
+                        `${selectedAgent.name} - ${selectedAgent.role}`;
+                    
+                    document.getElementById('messageInput').disabled = false;
+                    document.getElementById('sendButton').disabled = false;
+                    
+                    // Clear previous messages
+                    document.getElementById('chatMessages').innerHTML = '';
+                } else {
+                    // If not found in the list, try fetching from server
+                    const response = await fetch(`http://localhost:8080/api/agents/${id}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const agent = await response.json();
+                    console.log('Agent details from server:', agent);
+                    
+                    currentAgentId = id;
+                    document.getElementById('agentDescription').textContent = 
+                        `${agent.agent_name} - ${agent.agent_role}`;
+                    
+                    document.getElementById('messageInput').disabled = false;
+                    document.getElementById('sendButton').disabled = false;
+                    
+                    // Clear previous messages
+                    document.getElementById('chatMessages').innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error selecting agent:', error);
+                document.getElementById('agentDescription').textContent = 'Error loading agent details';
+                document.getElementById('messageInput').disabled = true;
+                document.getElementById('sendButton').disabled = true;
+            }
+        }
+
+        // Load agent's workflow
+        async function loadWorkflow(agentId) {
+            try {
+                const response = await fetch(`/api/agents/${agentId}/workflow`);
+                const workflow = await response.json();
+                
+                const workflowPreview = document.getElementById('workflowPreview');
+                const workflowContent = document.getElementById('workflowContent');
+                
+                if (workflow.nodes && workflow.nodes.length > 0) {
+                    workflowPreview.classList.remove('hidden');
+                    workflowContent.innerHTML = `
+                        <div class="space-y-2">
+                            ${workflow.nodes.map(node => `
+                                <div class="p-2 border rounded">
+                                    <div class="font-medium">${node.type}</div>
+                                    <div class="text-sm text-gray-600">${node.description || ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    workflowPreview.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading workflow:', error);
+            }
+        }
+
+        // Add a message to the chat
+        function addMessage(role, content, isError = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message p-4 ${isError ? 'bg-red-50' : role === 'user' ? 'bg-blue-50' : 'bg-gray-50'} rounded-lg mb-4`;
+            messageDiv.innerHTML = `
+                <div class="font-medium ${isError ? 'text-red-600' : role === 'user' ? 'text-blue-600' : 'text-gray-600'} mb-2">
+                    ${role === 'user' ? 'You' : 'Agent'}
+                </div>
+                <div class="${isError ? 'text-red-700' : 'text-gray-700'}">${content}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Send a message
+        async function sendMessage(event) {
+            event.preventDefault();
+            
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message || !currentAgentId) return;
+            
+            // Clear input and add loading state
+            messageInput.value = '';
+            const sendButton = document.getElementById('sendButton');
+            const originalText = sendButton.textContent;
+            sendButton.textContent = 'Sending...';
+            sendButton.disabled = true;
+            messageInput.disabled = true;
+            
+            // Add user message to chat
+            addMessage('user', message);
+            
+            try {
+                const response = await fetch(`http://localhost:8080/api/agents/${currentAgentId}/message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Server error (${response.status}): ${await response.text()}`);
+                }
+                
+                // Response will come through WebSocket
+            } catch (error) {
+                console.error('Error sending message:', error);
+                addMessage('assistant', `Error: ${error.message}. Please try again.`, true);
+            } finally {
+                // Restore button and input state
+                sendButton.textContent = originalText;
+                sendButton.disabled = false;
+                messageInput.disabled = false;
+                messageInput.focus();
+            }
+        }
+
+        // Modal functions
+        function createNewAgent() {
+            const modal = document.getElementById('newAgentModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeNewAgentModal() {
+            const modal = document.getElementById('newAgentModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Create new agent
+        async function submitNewAgent(event) {
+            event.preventDefault();
+            
+            const agentData = {
+                agent_name: document.getElementById('agentName').value,
+                agent_role: document.getElementById('agentRole').value,
+                agent_personality: document.getElementById('agentPersonality').value.split(',').map(s => s.trim()),
+                agent_expectations: document.getElementById('agentExpectations').value
+            };
+            
+            console.log('Submitting agent data:', agentData);
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/agents', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(agentData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const newAgent = await response.json();
+                console.log('Server response:', newAgent);
+                
+                // Close the modal
+                closeNewAgentModal();
+                
+                // Clear the form
+                document.getElementById('newAgentForm').reset();
+                
+                // Update the agent list with the new agent
+                updateAgentList(newAgent);
+                
+            } catch (error) {
+                console.error('Error creating agent:', error);
+                alert('Error creating agent. Please try again.');
+            }
+        }
+
+        // Prevent event bubbling for modal content clicks
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('newAgentModal');
+            const modalContent = modal.querySelector('.bg-white');
+            
+            modalContent.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeNewAgentModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
